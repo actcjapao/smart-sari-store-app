@@ -1,0 +1,6 @@
+1. Inertia “Pages” (most important)
+2. Props (Server → Client data flow)
+3. Inertia Links (<Link />)
+4. Forms with useForm() (CRITICAL)
+5. Redirects & Flash messages (Less important for now)
+6. Layouts (persistent layouts)
