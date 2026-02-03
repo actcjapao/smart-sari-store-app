@@ -10,7 +10,7 @@ This will serve as my guide throughout the development, deployment, & monitoring
 
 ## High Priority
 
-- [📝] Implement user table
+- [✅] Implement user table
 - [📝] Implement user registration functionality
     - Creates new user & its store
 - [📝] Implement store dashboard
