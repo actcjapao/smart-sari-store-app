@@ -4,47 +4,51 @@ import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
 import prettier from "eslint-config-prettier";
+import globals from "globals";
 
 export default [
-    js.configs.recommended,
+   js.configs.recommended,
 
-    {
-        files: ["resources/js/**/*.{js,jsx,ts,tsx}"],
-        languageOptions: {
-            parser: tsParser,
-            parserOptions: {
-                ecmaVersion: "latest",
-                sourceType: "module",
-                ecmaFeatures: {
-                    jsx: true,
-                },
+   {
+      files: ["resources/js/**/*.{js,jsx,ts,tsx}"],
+      languageOptions: {
+         parser: tsParser,
+         parserOptions: {
+            ecmaVersion: "latest",
+            sourceType: "module",
+            ecmaFeatures: {
+               jsx: true,
             },
-        },
-        plugins: {
-            react,
-            "react-hooks": reactHooks,
-            "@typescript-eslint": tseslint,
-        },
-        rules: {
-            ...react.configs.recommended.rules,
-            ...reactHooks.configs.recommended.rules,
-            ...tseslint.configs.recommended.rules,
+         },
+         globals: {
+            ...globals.browser,
+         },
+      },
+      plugins: {
+         react,
+         "react-hooks": reactHooks,
+         "@typescript-eslint": tseslint,
+      },
+      rules: {
+         ...react.configs.recommended.rules,
+         ...reactHooks.configs.recommended.rules,
+         ...tseslint.configs.recommended.rules,
 
-            // Inertia / React realities
-            "react/react-in-jsx-scope": "off",
-            "react/prop-types": "off",
+         // Inertia / React realities
+         "react/react-in-jsx-scope": "off",
+         "react/prop-types": "off",
 
-            // Quality-of-life
-            "no-unused-vars": "off",
-            "@typescript-eslint/no-unused-vars": ["warn"],
-        },
-        settings: {
-            react: {
-                version: "detect",
-            },
-        },
-    },
+         // Quality-of-life
+         "no-unused-vars": "off",
+         "@typescript-eslint/no-unused-vars": ["warn"],
+      },
+      settings: {
+         react: {
+            version: "detect",
+         },
+      },
+   },
 
-    // Disable formatting rules (Prettier owns formatting)
-    prettier,
+   // Disable formatting rules (Prettier owns formatting)
+   prettier,
 ];

@@ -1,4 +1,24 @@
+import { useForm } from "@inertiajs/react";
+import React from "react";
+
 const Registration = () => {
+   const { data, setData, post, processing, errors } = useForm({
+      name: "",
+      email: "",
+      password: "",
+      storeName: "",
+      location: "",
+      description: "",
+   });
+
+   const submitRegistration = (e: React.SubmitEvent) => {
+      e.preventDefault();
+      console.log("Submitting registration form with data:", data);
+      // post("/posts", {
+      //    preserveScroll: true,
+      // });
+   };
+
    return (
       <>
          <div className="min-h-screen flex items-center justify-center">
@@ -9,7 +29,7 @@ const Registration = () => {
                   </h5>
                </div>
                <div className="card-body">
-                  <form action="">
+                  <form onSubmit={submitRegistration}>
                      <div className="w-full">
                         <label
                            className="label-text"
@@ -20,9 +40,9 @@ const Registration = () => {
                         <input
                            data-theme="mintlify"
                            type="text"
-                           placeholder=""
                            className="input"
-                           id="labelAndHelperText"
+                           value={data.name}
+                           onChange={(e) => setData("name", e.target.value)}
                         />
                         <span className="helper-text hidden">
                            Please write your full name
@@ -38,10 +58,10 @@ const Registration = () => {
                         </label>
                         <input
                            data-theme="mintlify"
-                           type="text"
-                           placeholder=""
+                           type="email"
                            className="input"
-                           id="labelAndHelperText"
+                           value={data.email}
+                           onChange={(e) => setData("email", e.target.value)}
                         />
                         <span className="helper-text hidden">
                            Please write your full name
@@ -57,10 +77,10 @@ const Registration = () => {
                         </label>
                         <input
                            data-theme="mintlify"
-                           type="text"
-                           placeholder=""
+                           type="password"
                            className="input"
-                           id="labelAndHelperText"
+                           value={data.password}
+                           onChange={(e) => setData("password", e.target.value)}
                         />
                         <span className="helper-text hidden">
                            Please write your full name
@@ -77,9 +97,11 @@ const Registration = () => {
                         <input
                            data-theme="mintlify"
                            type="text"
-                           placeholder=""
                            className="input"
-                           id="labelAndHelperText"
+                           value={data.storeName}
+                           onChange={(e) =>
+                              setData("storeName", e.target.value)
+                           }
                         />
                         <span className="helper-text hidden">
                            Please write your full name
@@ -96,9 +118,9 @@ const Registration = () => {
                         <input
                            data-theme="mintlify"
                            type="text"
-                           placeholder=""
                            className="input"
-                           id="labelAndHelperText"
+                           value={data.location}
+                           onChange={(e) => setData("location", e.target.value)}
                         />
                         <span className="helper-text hidden">
                            Please write your full name
@@ -115,9 +137,11 @@ const Registration = () => {
                         <input
                            data-theme="mintlify"
                            type="text"
-                           placeholder=""
                            className="input"
-                           id="labelAndHelperText"
+                           value={data.description}
+                           onChange={(e) =>
+                              setData("description", e.target.value)
+                           }
                         />
                         <span className="helper-text hidden">
                            Please write your full name
@@ -127,7 +151,9 @@ const Registration = () => {
                      <div className="w-full mt-10 mb-3">
                         <button
                            data-theme="mintlify"
+                           type="submit"
                            className="btn btn-primary btn-block"
+                           disabled={processing}
                         >
                            Register
                         </button>
