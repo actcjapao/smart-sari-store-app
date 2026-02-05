@@ -10,6 +10,8 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.39.2",
+        "@iconify-json/tabler": "^1.2.26",
+        "@iconify/tailwind4": "^1.2.1",
         "@tailwindcss/vite": "^4.0.0",
         "@types/react": "^19.2.10",
         "@types/react-dom": "^19.2.3",
@@ -30,6 +32,7 @@
     },
     "dependencies": {
         "@inertiajs/react": "^2.3.11",
+        "flyonui": "^2.4.1",
         "react": "^19.2.4",
         "react-dom": "^19.2.4"
     }
