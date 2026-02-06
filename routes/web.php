@@ -15,6 +15,7 @@ Route::delete('/posts/{post}', [CrudController::class, 'destroy'])->name('posts.
 
 
 // Navigation Routes
-Route::get('/', [RegistrationController::class, 'loadRegistrationPage'])->name('registration.page.load');
+Route::get('/registration', [RegistrationController::class, 'loadRegistrationPage'])->name('registration.page.load');
 
 // API Routes
+Route::post('/api/register', [RegistrationController::class, 'register'])->name('registration.submit');
