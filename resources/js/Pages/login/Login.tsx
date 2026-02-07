@@ -1,5 +1,5 @@
 import { PageProps } from "@/types/PageProp.type";
-import { Link, useForm, usePage } from "@inertiajs/react";
+import { Link, router, useForm, usePage } from "@inertiajs/react";
 import React from "react";
 
 const Login = () => {
@@ -12,6 +12,19 @@ const Login = () => {
 
    const login = (e: React.SyntheticEvent) => {
       e.preventDefault();
+
+      post("/api/login", {
+         preserveScroll: true,
+         onSuccess: () => {
+            reset();
+            clearErrors();
+
+            // ⏳ Navigate after 2 seconds
+            setTimeout(() => {
+               router.visit("/dashboard");
+            }, 1000);
+         },
+      });
    };
 
    type FormFields = keyof typeof errors;
@@ -84,14 +97,14 @@ const Login = () => {
                            className="btn btn-primary btn-block"
                            disabled={processing}
                         >
-                           Register
+                           Login
                         </button>
                      </div>
                      <div className="w-full text-center mt-4">
                         <p className="text-sm text-gray-500">
                            Don&apos;t have an account?{" "}
                            <Link
-                              href="/"
+                              href="/registration"
                               className="text-primary font-medium hover:underline"
                            >
                               Register

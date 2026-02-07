@@ -69,8 +69,8 @@ class RegistrationController extends Controller
             'store_id' => $store->id,
         ]);
 
-        return redirect()
-        ->route('registration.page.load')
-        ->with('success', 'Registration successful!');
+        // Do not double redirect. Instead, use back() to return to the registration page with a success message.
+        // Then, in the frontend, you can check for this success message and redirect to the login page after a short delay.
+        return back()->with('success', 'Registration successful!');
     }
 }
