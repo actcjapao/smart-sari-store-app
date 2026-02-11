@@ -30,6 +30,15 @@ const Login = () => {
    type FormFields = keyof typeof errors;
    const hasError = (field: FormFields) => Boolean(errors[field]);
 
+   const isCredentialError = () => {
+      return (
+         (errors.email &&
+            errors.email.toLowerCase().includes("invalid email or password")) ||
+         (errors.password &&
+            errors.password.toLowerCase().includes("invalid email or password"))
+      );
+   };
+
    return (
       <>
          <div className="min-h-screen flex items-center justify-center">
@@ -45,6 +54,11 @@ const Login = () => {
                         <span>{flash.success}</span>
                      </div>
                   )}
+                  {flash.error && (
+                     <div className="alert alert-error" role="alert">
+                        <span>{flash.error}</span>
+                     </div>
+                  )}
                   <form onSubmit={login}>
                      <div className="w-full mt-2">
                         <label className="label-text" htmlFor="email">
@@ -54,14 +68,14 @@ const Login = () => {
                            id="email"
                            data-theme="mintlify"
                            type="email"
-                           className={`input ${hasError("email") ? "is-invalid" : ""}`}
+                           className={`input ${hasError("email") || isCredentialError() ? "is-invalid" : ""}`}
                            value={data.email}
                            onChange={(e) => {
                               setData("email", e.target.value);
                               clearErrors("email");
                            }}
                         />
-                        {hasError("email") && (
+                        {hasError("email") && !isCredentialError() && (
                            <p className="mt-1 text-sm text-red-500">
                               {errors.email}
                            </p>
@@ -76,14 +90,14 @@ const Login = () => {
                            id="password"
                            data-theme="mintlify"
                            type="password"
-                           className={`input ${hasError("password") ? "is-invalid" : ""}`}
+                           className={`input ${hasError("password") || isCredentialError() ? "is-invalid" : ""}`}
                            value={data.password}
                            onChange={(e) => {
                               setData("password", e.target.value);
                               clearErrors("password");
                            }}
                         />
-                        {hasError("password") && (
+                        {hasError("password") && !isCredentialError() && (
                            <p className="mt-1 text-sm text-red-500">
                               {errors.password}
                            </p>

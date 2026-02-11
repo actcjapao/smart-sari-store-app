@@ -13,7 +13,7 @@ This will serve as my guide throughout the development, deployment, & monitoring
 - [✅] Implement user table
 - [✅] Implement user registration functionality
    - Creates new user & its store
-- [⚙️] Add login page & implement login functionality
+- [✅] Add login page & implement login functionality
 - [⚙️] Implement store dashboard
 - [📝] Implement product page and list all products
 - [📝] Implement add product

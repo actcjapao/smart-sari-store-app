@@ -7,6 +7,31 @@ use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\DashboardController;
 
+// Temp Route --> This route is intended for managing session data
+Route::get('/session/{operation?}', function($operation = null){
+    // Restrict to specific environments only
+    $allowedEnvs = ["local", "dev", "development", "staging", "test"];
+    
+    if (!App::environment($allowedEnvs)) {
+        abort(403, 'Access denied. This route is not available in '.App::environment().' environment.');
+    }
+
+    if($operation == null) {
+        echo "- Specify a proper URL";
+    } else if ($operation == "view") {
+        $existingSession = session()->all();
+        dd($existingSession);
+    } else if ($operation == "clear") {
+        session()->pull('auth_token');
+        echo "- All session data has been flushed (hard reset).";
+    } else if ($operation === "flush") {
+        session()->flush();
+        echo "- All session data has been flushed (hard reset).";
+    } else {
+        echo "- Specify a proper URL";
+    }
+});
+
 // Sample CRUD Operation Routes
 Route::get('/sample-crud', [CrudController::class, 'loadList'])->name('list.load');
 Route::get('/posts/add', [CrudController::class, 'create'])->name('posts.create');

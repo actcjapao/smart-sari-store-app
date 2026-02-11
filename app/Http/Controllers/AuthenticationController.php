@@ -3,23 +3,26 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Hash;
+
+use App\Models\User;
 
 class AuthenticationController extends Controller
 {
     function loadLoginPage() {
-        return inertia('login/Login');
+        return Inertia::render('login/Login');
     }
 
     function login(Request $request) {
         $rules = [
-            'email' => 'required|email|string',
+            'email' => 'required|email',
             'password' => 'required|string'
         ];
 
         $customErrorMessages = [
             'email.required' => 'Email is required.',
             'email.email' => 'Email must be a valid email address.',
-            'email.string' => 'Email must be a string.',
             
             'password.required' => 'Password is required.',
             'password.string' => 'Password must be a string.'
@@ -27,8 +30,39 @@ class AuthenticationController extends Controller
 
         $request->validate($rules, $customErrorMessages);
 
-        // Authentication logic will be implemented here in the future
+        $user = User::where(['email' => $request->email])->first();
 
+        if (!$user) {
+            // Return 422 validation error
+            return back()
+                ->withErrors([
+                    'email' => 'Invalid email or password.',
+                ])
+                ->with('error', 'Invalid email or password.');
+        }
+
+        $isValidPassword = Hash::check($request->password, $user->password);
+
+        if (!$isValidPassword) {
+            return back()
+                ->withErrors([
+                    'password' => 'Invalid email or password.',
+                ])
+                ->with('error', 'Invalid email or password.');
+        }
+
+        $rawTokenObject = [
+            'account_id' => $user->account_id
+        ];
+        $userToken = Hash::make(json_encode($rawTokenObject));
+        $authenticatedUser = (object) [
+            'token' => $userToken,
+            'uuid' => $user->uuid,
+            'name' => $user->name,
+            'email' => $user->email,
+        ];
+
+        session()->put('authenticated_user', $authenticatedUser);
         return back()->with('success', 'Logged in successfully.');
     }
 }
