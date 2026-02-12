@@ -6,6 +6,7 @@ use App\Http\Controllers\CrudController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProductController;
 
 // Temp Route --> This route is intended for managing session data
 Route::get('/session/{operation?}', function($operation = null){
@@ -44,6 +45,7 @@ Route::delete('/posts/{post}', [CrudController::class, 'destroy'])->name('posts.
 Route::get('/registration', [RegistrationController::class, 'loadRegistrationPage'])->name('registration.page.load');
 Route::get('/login', [AuthenticationController::class, 'loadLoginPage'])->name('login.page.load');
 Route::get('/dashboard', [DashboardController::class, 'loadDashboardPage'])->name('dashboard.page.load');
+Route::get('/products', [ProductController::class, 'loadProductsPage'])->name('products.page.load');
 
 // API Routes
 Route::post('/api/register', [RegistrationController::class, 'register'])->name('registration.submit');
