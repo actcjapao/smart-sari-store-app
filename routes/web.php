@@ -48,5 +48,7 @@ Route::get('/dashboard', [DashboardController::class, 'loadDashboardPage'])->nam
 Route::get('/products', [ProductController::class, 'loadProductsPage'])->name('products.page.load');
 
 // API Routes
-Route::post('/api/register', [RegistrationController::class, 'register'])->name('registration.submit');
-Route::post('/api/login', [AuthenticationController::class, 'login'])->name('login.submit');
+Route::post('/api/register', [RegistrationController::class, 'register'])->name('registration');
+Route::post('/api/login', [AuthenticationController::class, 'login'])->name('login');
+
+Route::post('/api/product/save', [ProductController::class, 'save'])->name('product.save');
