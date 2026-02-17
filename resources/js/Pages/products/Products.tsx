@@ -1,43 +1,83 @@
 import MainPanelLayout from "@/components/MainPanelLayout";
-import React from "react";
+import { router, useForm } from "@inertiajs/react";
+import React, { useState } from "react";
 
-const Products = () => {
-   const products = [
-      {
-         id: 1,
-         name: "MacBook Pro M3",
-         sku: "MBP-M3-2024",
-         status: "Active",
-         date: "March 1, 2024",
-      },
-      {
-         id: 2,
-         name: "iPhone 15 Pro",
-         sku: "IP15P-256GB",
-         status: "Out of Stock",
-         date: "March 2, 2024",
-      },
-      {
-         id: 3,
-         name: "AirPods Pro",
-         sku: "APP-2NDGEN",
-         status: "Draft",
-         date: "March 3, 2024",
-      },
-   ];
+const products = [
+   {
+      id: 1,
+      uuid: "uuid-12345",
+      name: "MacBook Pro M3",
+      brand: "MBP-M3-2024",
+      description: "The latest MacBook Pro with M3 chip.",
+      stock_quantity: 10,
+      price: 1999.99,
+      tags: ["laptop", "apple", "electronics"],
+   },
+];
 
-   const getStatusBadge = (status: string) => {
-      switch (status) {
-         case "Active":
-            return "badge-success";
-         case "Out of Stock":
-            return "badge-error";
-         case "Draft":
-            return "badge-warning";
-         default:
-            return "badge-primary";
+const Products = ({ store_id }: { store_id: number }) => {
+   const [tagInput, setTagInput] = useState("");
+   const { data, setData, post, processing, errors, clearErrors, reset } =
+      useForm({
+         store_id,
+         name: "",
+         brand: "",
+         description: "",
+         stock_quantity: "",
+         price: "",
+         tags: [] as string[],
+      });
+
+   const addTag = () => {
+      const value = tagInput.trim().toLowerCase();
+
+      if (!value) return;
+
+      if (!data.tags.includes(value)) {
+         setData("tags", [...data.tags, value]);
+      }
+
+      setTagInput("");
+   };
+
+   const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter" || e.key === ",") {
+         e.preventDefault();
+         addTag();
       }
    };
+
+   const removeTag = (tagToRemove: string) => {
+      setData(
+         "tags",
+         data.tags.filter((tag) => tag !== tagToRemove),
+      );
+   };
+
+   const addProduct = (e: React.SyntheticEvent) => {
+      e.preventDefault();
+
+      post("/api/product/save", {
+         preserveScroll: true,
+         // onStart: () => {},
+         // onFinish: () => {},
+         onError: (errors) => {
+            console.log("Validation Errors:", errors);
+         },
+         onSuccess: () => {
+            reset();
+            clearErrors();
+
+            // // ⏳ Navigate after 2 seconds
+            // setTimeout(() => {
+            //    router.visit("/products");
+            // }, 2000);
+         },
+      });
+   };
+
+   type FormFields = keyof typeof errors;
+   const hasError = (field: FormFields) => Boolean(errors[field]);
 
    return (
       <>
@@ -64,9 +104,10 @@ const Products = () => {
                      <thead>
                         <tr>
                            <th>Name</th>
-                           <th>SKU</th>
-                           <th>Status</th>
-                           <th>Date Added</th>
+                           <th>Brand</th>
+                           <th>Stock</th>
+                           <th>Price</th>
+                           <th>Tags</th>
                            <th className="text-right">Actions</th>
                         </tr>
                      </thead>
@@ -74,17 +115,10 @@ const Products = () => {
                         {products.map((product) => (
                            <tr key={product.id} className="row-hover">
                               <td className="font-medium">{product.name}</td>
-                              <td>{product.sku}</td>
-                              <td>
-                                 <span
-                                    className={`badge badge-soft ${getStatusBadge(
-                                       product.status,
-                                    )} text-xs`}
-                                 >
-                                    {product.status}
-                                 </span>
-                              </td>
-                              <td>{product.date}</td>
+                              <td>{product.brand}</td>
+                              <td>{product.stock_quantity}</td>
+                              <td>{product.price}</td>
+                              <td>{product.tags.join(", ")}</td>
                               <td className="text-right space-x-1">
                                  <button
                                     className="btn btn-circle btn-text btn-sm"
@@ -122,10 +156,10 @@ const Products = () => {
             role="dialog"
             tabIndex={-1}
          >
-            <div className="modal-dialog modal-dialog-lg">
+            <div className="modal-dialog">
                <div className="modal-content">
                   <div className="modal-header">
-                     <h3 className="modal-title">Dialog Title</h3>
+                     <h3 className="modal-title">Add Product</h3>
                      <button
                         type="button"
                         className="btn btn-text btn-circle btn-sm absolute end-3 top-3"
@@ -136,27 +170,189 @@ const Products = () => {
                      </button>
                   </div>
                   <div className="modal-body">
-                     <p>
-                        {" "}
-                        This is some placeholder content to show the scrolling
-                        behavior for modals. Instead of repeating the text in
-                        the modal, we use an inline style to set a minimum
-                        height, thereby extending the length of the overall
-                        modal and demonstrating the overflow scrolling. When
-                        content becomes longer than the height of the viewport,
-                        scrolling will move the modal as needed.{" "}
-                     </p>
+                     <form id="add-product-form" onSubmit={addProduct}>
+                        <div className="w-full space-y-2">
+                           <label
+                              className="label-text font-medium"
+                              htmlFor="name"
+                           >
+                              Name
+                           </label>
+                           <input
+                              id="name"
+                              data-theme="mintlify"
+                              type="text"
+                              className={`input w-full ${hasError("name") ? "is-invalid" : ""}`}
+                              value={data.name}
+                              onChange={(e) => {
+                                 setData("name", e.target.value);
+                                 clearErrors("name");
+                              }}
+                           />
+                           {hasError("name") && (
+                              <p className="mt-1 text-sm text-red-500">
+                                 {errors.name}
+                              </p>
+                           )}
+                        </div>
+                        <div className="w-full space-y-2">
+                           <label className="label-text" htmlFor="brand">
+                              <span className="font-medium">Brand</span>
+                              <span> (optional)</span>
+                           </label>
+                           <input
+                              id="brand"
+                              data-theme="mintlify"
+                              type="text"
+                              className={`input w-full ${hasError("brand") ? "is-invalid" : ""}`}
+                              value={data.brand}
+                              onChange={(e) => {
+                                 setData("brand", e.target.value);
+                                 clearErrors("brand");
+                              }}
+                           />
+                           {hasError("brand") && (
+                              <p className="mt-1 text-sm text-red-500">
+                                 {errors.brand}
+                              </p>
+                           )}
+                        </div>
+                        <div className="w-full space-y-2">
+                           <label className="label-text" htmlFor="description">
+                              <span className="font-medium">Description</span>
+                              <span> (optional)</span>
+                           </label>
+                           <input
+                              id="description"
+                              data-theme="mintlify"
+                              type="text"
+                              className={`input w-full ${hasError("description") ? "is-invalid" : ""}`}
+                              value={data.description}
+                              onChange={(e) => {
+                                 setData("description", e.target.value);
+                                 clearErrors("description");
+                              }}
+                           />
+                           {hasError("description") && (
+                              <p className="mt-1 text-sm text-red-500">
+                                 {errors.description}
+                              </p>
+                           )}
+                        </div>
+                        <div className="w-full space-y-2">
+                           <label
+                              className="label-text font-medium"
+                              htmlFor="stock_quantity"
+                           >
+                              Stock Qty
+                           </label>
+                           <input
+                              id="stock_quantity"
+                              data-theme="mintlify"
+                              type="text"
+                              className={`input w-full ${hasError("stock_quantity") ? "is-invalid" : ""}`}
+                              value={data.stock_quantity}
+                              onChange={(e) => {
+                                 setData("stock_quantity", e.target.value);
+                                 clearErrors("stock_quantity");
+                              }}
+                           />
+                           {hasError("stock_quantity") && (
+                              <p className="mt-1 text-sm text-red-500">
+                                 {errors.stock_quantity}
+                              </p>
+                           )}
+                        </div>
+                        <div className="w-full space-y-2">
+                           <label
+                              className="label-text font-medium"
+                              htmlFor="price"
+                           >
+                              Price
+                           </label>
+                           <input
+                              id="price"
+                              data-theme="mintlify"
+                              type="text"
+                              className={`input w-full ${hasError("price") ? "is-invalid" : ""}`}
+                              value={data.price}
+                              onChange={(e) => {
+                                 setData("price", e.target.value);
+                                 clearErrors("price");
+                              }}
+                           />
+                           {hasError("price") && (
+                              <p className="mt-1 text-sm text-red-500">
+                                 {errors.price}
+                              </p>
+                           )}
+                        </div>
+                        {/* Tags Field */}
+                        <div className="w-full space-y-2 mt-4">
+                           <label className="label-text" htmlFor="tags">
+                              <span className="font-medium">Tags</span>
+                              <span> (optional)</span>
+                           </label>
+
+                           {/* Input */}
+                           <input
+                              id="tags"
+                              type="text"
+                              data-theme="mintlify"
+                              className="input input-bordered w-full"
+                              placeholder="Type tag and press Enter"
+                              value={tagInput}
+                              onChange={(e) => setTagInput(e.target.value)}
+                              onKeyDown={handleTagKeyDown}
+                           />
+
+                           {/* Pills */}
+                           <div className="flex flex-wrap gap-2 mb-2">
+                              {data.tags.map((tag: string) => (
+                                 <span
+                                    key={tag}
+                                    className="badge badge-primary badge-soft flex items-center gap-1 px-3 py-2"
+                                 >
+                                    {tag}
+                                    <button
+                                       type="button"
+                                       onClick={() => removeTag(tag)}
+                                       className="ml-1"
+                                    >
+                                       <span className="icon-[tabler--x] size-3"></span>
+                                    </button>
+                                 </span>
+                              ))}
+                           </div>
+
+                           {errors.tags && (
+                              <p className="text-sm text-red-500 mt-1">
+                                 {errors.tags}
+                              </p>
+                           )}
+                        </div>
+                     </form>
                   </div>
-                  <div className="modal-footer">
+
+                  <div className="modal-footer flex justify-end gap-3">
                      <button
                         type="button"
-                        className="btn btn-soft btn-secondary"
+                        data-theme="mintlify"
+                        className="btn btn-outline btn-accent"
                         data-overlay="#add-product-modal"
                      >
-                        Close
+                        Cancel
                      </button>
-                     <button type="button" className="btn btn-primary">
-                        Save changes
+
+                     {/* Submit Button */}
+                     <button
+                        type="submit"
+                        form="add-product-form"
+                        data-theme="mintlify"
+                        className="btn btn-primary px-7"
+                        disabled={processing}
+                     >
+                        Add
                      </button>
                   </div>
                </div>

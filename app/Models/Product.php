@@ -38,6 +38,11 @@ class Product extends Model
         'tags',
     ];
 
+    // Automatically converts JSON columns to/from PHP arrays
+    protected $casts = [
+        'tags' => 'array',
+    ];
+
     /**
      * Tell Laravel which column is the UUID to auto-generate.
      * 
