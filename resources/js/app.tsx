@@ -4,6 +4,8 @@ import { createInertiaApp } from "@inertiajs/react";
 import { ComponentType } from "react";
 import { createRoot } from "react-dom/client";
 
+import "flyonui/flyonui.js";
+
 createInertiaApp({
    resolve: (name) => {
       const pages = import.meta.glob<ComponentType>("./Pages/**/*.tsx", {
