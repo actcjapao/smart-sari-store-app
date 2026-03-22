@@ -6,6 +6,15 @@ import { createRoot } from "react-dom/client";
 
 import "flyonui/flyonui.js";
 
+// Extend Window interface for FlyonUI HSStaticMethods
+declare global {
+   interface Window {
+      HSStaticMethods?: {
+         autoInit: () => void;
+      };
+   }
+}
+
 createInertiaApp({
    resolve: (name) => {
       const pages = import.meta.glob<ComponentType>("./Pages/**/*.tsx", {

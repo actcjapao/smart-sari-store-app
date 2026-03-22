@@ -1,6 +1,6 @@
 import MainPanelLayout from "@/components/MainPanelLayout";
 import { useForm } from "@inertiajs/react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Product } from "./types";
 
 const Products = ({
@@ -21,6 +21,15 @@ const Products = ({
          price: "",
          tags: [] as string[],
       });
+
+   // Reinitialize FlyonUI when component mounts
+   // Without this, the modal won't work when navigating to this page via Inertia links
+   useEffect(() => {
+      // Access the global FlyonUI/HSStaticMethods
+      if (window.HSStaticMethods) {
+         window.HSStaticMethods.autoInit();
+      }
+   }, []);
 
    const addTag = () => {
       const value = tagInput.trim().toLowerCase();
