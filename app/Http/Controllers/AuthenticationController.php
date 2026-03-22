@@ -10,7 +10,7 @@ use App\Models\User;
 
 class AuthenticationController extends Controller
 {
-    function loadLoginPage() {
+    function loadPage() {
         return Inertia::render('login/Login');
     }
 

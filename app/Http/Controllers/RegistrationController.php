@@ -11,7 +11,7 @@ use App\Models\UserStore;
 
 class RegistrationController extends Controller
 {
-    function loadRegistrationPage() {
+    function loadPage() {
         return inertia('registration/Registration');
     }
 

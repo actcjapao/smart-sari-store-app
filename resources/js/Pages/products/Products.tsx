@@ -1,21 +1,15 @@
 import MainPanelLayout from "@/components/MainPanelLayout";
-import { router, useForm } from "@inertiajs/react";
+import { useForm } from "@inertiajs/react";
 import React, { useState } from "react";
+import { Product } from "./types";
 
-const products = [
-   {
-      id: 1,
-      uuid: "uuid-12345",
-      name: "MacBook Pro M3",
-      brand: "MBP-M3-2024",
-      description: "The latest MacBook Pro with M3 chip.",
-      stock_quantity: 10,
-      price: 1999.99,
-      tags: ["laptop", "apple", "electronics"],
-   },
-];
-
-const Products = ({ store_id }: { store_id: number }) => {
+const Products = ({
+   store_id,
+   products,
+}: {
+   store_id: number;
+   products: Product[];
+}) => {
    const [tagInput, setTagInput] = useState("");
    const { data, setData, post, processing, errors, clearErrors, reset } =
       useForm({
@@ -59,6 +53,7 @@ const Products = ({ store_id }: { store_id: number }) => {
 
       post("/api/product/save", {
          preserveScroll: true,
+         only: ["products"], // reload only products prop
          // onStart: () => {},
          // onFinish: () => {},
          onError: (errors) => {

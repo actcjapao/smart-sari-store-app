@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    function loadDashboardPage() {
+    function loadPage() {
         return inertia('dashboard/Dashboard');
     }
 }

@@ -42,10 +42,10 @@ Route::put('/posts/{post}', [CrudController::class, 'update'])->name('posts.upda
 Route::delete('/posts/{post}', [CrudController::class, 'destroy'])->name('posts.destroy');
 
 // Navigation Routes
-Route::get('/registration', [RegistrationController::class, 'loadRegistrationPage'])->name('registration.page.load');
-Route::get('/login', [AuthenticationController::class, 'loadLoginPage'])->name('login.page.load');
-Route::get('/dashboard', [DashboardController::class, 'loadDashboardPage'])->name('dashboard.page.load');
-Route::get('/products', [ProductController::class, 'loadProductsPage'])->name('products.page.load');
+Route::get('/registration', [RegistrationController::class, 'loadPage'])->name('registration.page.load');
+Route::get('/login', [AuthenticationController::class, 'loadPage'])->name('login.page.load');
+Route::get('/dashboard', [DashboardController::class, 'loadPage'])->name('dashboard.page.load');
+Route::get('/products', [ProductController::class, 'loadPage'])->name('products.page.load');
 
 // API Routes
 Route::post('/api/register', [RegistrationController::class, 'register'])->name('registration');

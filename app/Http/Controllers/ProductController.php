@@ -10,14 +10,19 @@ use App\Models\UserStore;
 
 class ProductController extends Controller
 {
-    function loadProductsPage() {
+    function loadPage() {
         $authenticatedUser = session('authenticated_user');
         $userUuid = $authenticatedUser->uuid;
         $user = User::where('uuid', $userUuid)->firstOrFail();
         $userStore = UserStore::where('user_id', $user->id)->firstOrFail();
         
+        $products = Product::where('store_id', $userStore->id)
+                        ->latest()
+                        ->get();
+
         return inertia('products/Products', [
-            'store_id' => $userStore->id
+            'store_id' => $userStore->id,
+            'products' => $products
         ]);
     }
 
@@ -79,6 +84,7 @@ class ProductController extends Controller
             'tags' => $validatedData['tags'] ?? [],
         ]);
 
+        // Redirect to the products page with a success message (but only reloads the product list in the frontend)
         return back()->with('success', 'Product added successfully!');
     }
 }
