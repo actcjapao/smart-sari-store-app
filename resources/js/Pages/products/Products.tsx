@@ -27,7 +27,6 @@ const Products = ({
 
    const [mode, setMode] = useState<"add" | "edit">("add");
    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-   const [showFlash, setShowFlash] = useState<boolean>(false);
 
    // Reinitialize FlyonUI when component mounts
    // Without this, the modal won't work when navigating to this page via Inertia links
@@ -83,22 +82,13 @@ const Products = ({
                setMode("add");
                setSelectedProduct(null);
 
-               if (flash.success || flash.error) {
-                  setShowFlash(true);
-
-                  // Hide flash after 3 seconds
-                  setTimeout(() => {
-                     setShowFlash(false);
-                  }, 3000);
-               }
-
                // Close modal after showing success message
                setTimeout(() => {
                   const closeButton = document.querySelector(
                      '[data-overlay="#product-modal"]',
                   ) as HTMLElement;
 
-                  closeButton.click();
+                  closeButton?.click();
                }, 1300);
             },
          },
@@ -231,7 +221,7 @@ const Products = ({
                      </button>
                   </div>
                   <div className="modal-body">
-                     {showFlash && (
+                     {flash.success !== null && (
                         <div
                            data-theme="mintlify"
                            className="alert alert-primary mb-4"
@@ -240,7 +230,7 @@ const Products = ({
                            <span>{flash.success}</span>
                         </div>
                      )}
-                     {showFlash && (
+                     {flash.error !== null && (
                         <div
                            data-theme="mintlify"
                            className="alert alert-error mb-4"
