@@ -11,6 +11,7 @@ declare global {
    interface Window {
       HSStaticMethods?: {
          autoInit: () => void;
+         close: (element: HTMLElement) => void;
       };
    }
 }

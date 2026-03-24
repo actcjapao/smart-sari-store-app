@@ -51,4 +51,4 @@ Route::get('/products', [ProductController::class, 'loadPage'])->name('products.
 Route::post('/api/register', [RegistrationController::class, 'register'])->name('registration');
 Route::post('/api/login', [AuthenticationController::class, 'login'])->name('login');
 
-Route::post('/api/product/save', [ProductController::class, 'save'])->name('product.save');
+Route::post('/api/product/save/{product_uuid?}', [ProductController::class, 'save'])->name('product.save');

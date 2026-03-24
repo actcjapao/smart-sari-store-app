@@ -27,10 +27,15 @@ class ProductController extends Controller
         ]);
     }
 
-    function save(SaveProductRequest $request) {
-        $product = Product::create($request->validated());
+    function save(SaveProductRequest $request, $product_uuid = null) {
+        if ($product_uuid) {
+            $product = Product::where('uuid', $product_uuid)->firstOrFail();
+            $product->update($request->validated());
+        } else {
+            $product = Product::create($request->validated());
+        }
 
         // Redirect to the products page with a success message (but only reloads the product list in the frontend)
-        return back()->with('success', 'Product added successfully!');
+        return back()->with('success', 'Product saved successfully!');
     }
 }

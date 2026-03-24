@@ -1,7 +1,8 @@
 import MainPanelLayout from "@/components/MainPanelLayout";
-import { useForm } from "@inertiajs/react";
+import { useForm, usePage } from "@inertiajs/react";
 import React, { useState, useEffect } from "react";
 import { Product } from "./types";
+import { PageProps } from "@/types/PageProp.type";
 
 const Products = ({
    store_id,
@@ -10,10 +11,12 @@ const Products = ({
    store_id: number;
    products: Product[];
 }) => {
+   const { flash } = usePage<PageProps>().props;
    const [tagInput, setTagInput] = useState("");
    const { data, setData, post, processing, errors, clearErrors, reset } =
       useForm({
-         store_id,
+         product_uuid: "",
+         store_id: store_id,
          name: "",
          brand: "",
          description: "",
@@ -21,6 +24,10 @@ const Products = ({
          price: "",
          tags: [] as string[],
       });
+
+   const [mode, setMode] = useState<"add" | "edit">("add");
+   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+   const [showFlash, setShowFlash] = useState<boolean>(false);
 
    // Reinitialize FlyonUI when component mounts
    // Without this, the modal won't work when navigating to this page via Inertia links
@@ -57,27 +64,71 @@ const Products = ({
       );
    };
 
-   const addProduct = (e: React.SyntheticEvent) => {
+   const saveProduct = (e: React.SyntheticEvent) => {
       e.preventDefault();
 
-      post("/api/product/save", {
-         preserveScroll: true,
-         only: ["products"], // reload only products prop
-         // onStart: () => {},
-         // onFinish: () => {},
-         onError: (errors) => {
-            console.log("Validation Errors:", errors);
-         },
-         onSuccess: () => {
-            reset();
-            clearErrors();
+      post(
+         `/api/product/save/${mode === "edit" && selectedProduct ? selectedProduct.uuid : ""}`,
+         {
+            preserveScroll: true,
+            only: ["products", "flash"], // reload only products and flash props
+            // onStart: () => {}, // can be used to set a loading state if needed
+            // onFinish: () => {}, // can be used to reset loading state
+            onError: (errors) => {
+               console.log("Validation Errors:", errors);
+            },
+            onSuccess: () => {
+               reset();
+               clearErrors();
+               setMode("add");
+               setSelectedProduct(null);
 
-            // // ⏳ Navigate after 2 seconds
-            // setTimeout(() => {
-            //    router.visit("/products");
-            // }, 2000);
+               if (flash.success || flash.error) {
+                  setShowFlash(true);
+
+                  // Hide flash after 3 seconds
+                  setTimeout(() => {
+                     setShowFlash(false);
+                  }, 3000);
+               }
+
+               // Close modal after showing success message
+               setTimeout(() => {
+                  const closeButton = document.querySelector(
+                     '[data-overlay="#product-modal"]',
+                  ) as HTMLElement;
+
+                  closeButton.click();
+               }, 1300);
+            },
          },
-      });
+      );
+   };
+
+   const openAddProductModal = () => {
+      reset(); // clear form
+      setMode("add");
+      setSelectedProduct(null);
+      clearErrors(); // clear validation errors
+   };
+
+   const openEditProductModal = (product: Product) => {
+      reset(); // clear form
+      setMode("edit");
+      setSelectedProduct(product);
+      clearErrors(); // clear validation errors
+
+      setData((prev) => ({
+         ...prev,
+         product_uuid: product.uuid,
+         store_id,
+         name: product.name,
+         brand: product.brand || "",
+         description: product.description || "",
+         stock_quantity: String(product.stock_quantity),
+         price: String(product.price),
+         tags: product.tags || [],
+      }));
    };
 
    type FormFields = keyof typeof errors;
@@ -95,8 +146,9 @@ const Products = ({
                      className="btn btn-primary"
                      aria-haspopup="dialog"
                      aria-expanded="false"
-                     aria-controls="add-product-modal"
-                     data-overlay="#add-product-modal"
+                     aria-controls="product-modal"
+                     data-overlay="#product-modal"
+                     onClick={openAddProductModal}
                   >
                      <span className="icon-[tabler--plus] size-4"></span>
                      Add Product
@@ -127,6 +179,11 @@ const Products = ({
                                  <button
                                     className="btn btn-circle btn-text btn-sm"
                                     aria-label="Edit"
+                                    aria-controls="product-modal"
+                                    data-overlay="#product-modal"
+                                    onClick={() =>
+                                       openEditProductModal(product)
+                                    }
                                  >
                                     <span className="icon-[tabler--pencil] size-5"></span>
                                  </button>
@@ -153,9 +210,9 @@ const Products = ({
             </div>
          </div>
 
-         {/* Add Product Modal */}
+         {/* Save Product Modal (Add / Edit) */}
          <div
-            id="add-product-modal"
+            id="product-modal"
             className="overlay modal overlay-open:opacity-100 overlay-open:duration-300 modal-middle hidden"
             role="dialog"
             tabIndex={-1}
@@ -163,18 +220,36 @@ const Products = ({
             <div className="modal-dialog">
                <div className="modal-content">
                   <div className="modal-header">
-                     <h3 className="modal-title">Add Product</h3>
+                     <h3 className="modal-title">{`${mode === "edit" ? "Edit" : "Add"} Product`}</h3>
                      <button
                         type="button"
                         className="btn btn-text btn-circle btn-sm absolute end-3 top-3"
                         aria-label="Close"
-                        data-overlay="#add-product-modal"
+                        data-overlay="#product-modal"
                      >
                         <span className="icon-[tabler--x] size-4"></span>
                      </button>
                   </div>
                   <div className="modal-body">
-                     <form id="add-product-form" onSubmit={addProduct}>
+                     {showFlash && (
+                        <div
+                           data-theme="mintlify"
+                           className="alert alert-primary mb-4"
+                           role="alert"
+                        >
+                           <span>{flash.success}</span>
+                        </div>
+                     )}
+                     {showFlash && (
+                        <div
+                           data-theme="mintlify"
+                           className="alert alert-error mb-4"
+                           role="alert"
+                        >
+                           <span>{flash.error}</span>
+                        </div>
+                     )}
+                     <form id="product-form" onSubmit={saveProduct}>
                         <div className="w-full space-y-2">
                            <label
                               className="label-text font-medium"
@@ -343,7 +418,7 @@ const Products = ({
                         type="button"
                         data-theme="mintlify"
                         className="btn btn-outline btn-accent"
-                        data-overlay="#add-product-modal"
+                        data-overlay="#product-modal"
                      >
                         Cancel
                      </button>
@@ -351,12 +426,12 @@ const Products = ({
                      {/* Submit Button */}
                      <button
                         type="submit"
-                        form="add-product-form"
+                        form="product-form"
                         data-theme="mintlify"
                         className="btn btn-primary px-7"
                         disabled={processing}
                      >
-                        Add
+                        {mode === "add" ? "Add" : "Update"}
                      </button>
                   </div>
                </div>
