@@ -3,6 +3,7 @@ import { useForm, usePage } from "@inertiajs/react";
 import React, { useState, useEffect } from "react";
 import { Product } from "./types";
 import { PageProps } from "@/types/PageProp.type";
+import FlashAlert from "@/components/alert/FlashAlert";
 
 const Products = ({
    store_id,
@@ -222,22 +223,18 @@ const Products = ({
                   </div>
                   <div className="modal-body">
                      {flash.success !== null && (
-                        <div
-                           data-theme="mintlify"
-                           className="alert alert-primary mb-4"
-                           role="alert"
-                        >
-                           <span>{flash.success}</span>
-                        </div>
+                        <FlashAlert
+                           key={flash.success}
+                           type="success"
+                           message={flash.success ?? ""}
+                        />
                      )}
                      {flash.error !== null && (
-                        <div
-                           data-theme="mintlify"
-                           className="alert alert-error mb-4"
-                           role="alert"
-                        >
-                           <span>{flash.error}</span>
-                        </div>
+                        <FlashAlert
+                           key={flash.error}
+                           type="error"
+                           message={flash.error ?? ""}
+                        />
                      )}
                      <form id="product-form" onSubmit={saveProduct}>
                         <div className="w-full space-y-2">
