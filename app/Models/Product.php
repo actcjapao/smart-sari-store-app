@@ -55,4 +55,12 @@ class Product extends Model
     {
         return ['uuid'];
     }
+
+    /**
+     * Get the store this product belongs to.
+     */
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
+    }
 }

@@ -30,7 +30,7 @@ class AuthenticationController extends Controller
 
         $request->validate($rules, $customErrorMessages);
 
-        $user = User::where(['email' => $request->email])->first();
+        $user = User::where('email', $request->email)->first();
 
         if (!$user) {
             // Return 422 validation error

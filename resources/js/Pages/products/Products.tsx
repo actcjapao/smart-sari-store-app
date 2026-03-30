@@ -38,6 +38,10 @@ const Products = ({
       }
    }, []);
 
+   useEffect(() => {
+      console.log("products", products);
+   }, [products]);
+
    const addTag = () => {
       const value = tagInput.trim().toLowerCase();
 
@@ -159,42 +163,43 @@ const Products = ({
                         </tr>
                      </thead>
                      <tbody>
-                        {products.map((product) => (
-                           <tr key={product.id} className="row-hover">
-                              <td className="font-medium">{product.name}</td>
-                              <td>{product.brand}</td>
-                              <td>{product.stock_quantity}</td>
-                              <td>{product.price}</td>
-                              <td>{product.tags.join(", ")}</td>
-                              <td className="text-right space-x-1">
-                                 <button
-                                    className="btn btn-circle btn-text btn-sm"
-                                    aria-label="Edit"
-                                    aria-controls="product-modal"
-                                    data-overlay="#product-modal"
-                                    onClick={() =>
-                                       openEditProductModal(product)
-                                    }
-                                 >
-                                    <span className="icon-[tabler--pencil] size-5"></span>
-                                 </button>
+                        {products.length > 0 &&
+                           products.map((product) => (
+                              <tr key={product.id} className="row-hover">
+                                 <td className="font-medium">{product.name}</td>
+                                 <td>{product.brand}</td>
+                                 <td>{product.stock_quantity}</td>
+                                 <td>{product.price}</td>
+                                 <td>{product.tags.join(", ")}</td>
+                                 <td className="text-right space-x-1">
+                                    <button
+                                       className="btn btn-circle btn-text btn-sm"
+                                       aria-label="Edit"
+                                       aria-controls="product-modal"
+                                       data-overlay="#product-modal"
+                                       onClick={() =>
+                                          openEditProductModal(product)
+                                       }
+                                    >
+                                       <span className="icon-[tabler--pencil] size-5"></span>
+                                    </button>
 
-                                 <button
-                                    className="btn btn-circle btn-text btn-sm"
-                                    aria-label="Delete"
-                                 >
-                                    <span className="icon-[tabler--trash] size-5"></span>
-                                 </button>
+                                    <button
+                                       className="btn btn-circle btn-text btn-sm"
+                                       aria-label="Delete"
+                                    >
+                                       <span className="icon-[tabler--trash] size-5"></span>
+                                    </button>
 
-                                 <button
-                                    className="btn btn-circle btn-text btn-sm"
-                                    aria-label="More"
-                                 >
-                                    <span className="icon-[tabler--dots-vertical] size-5"></span>
-                                 </button>
-                              </td>
-                           </tr>
-                        ))}
+                                    <button
+                                       className="btn btn-circle btn-text btn-sm"
+                                       aria-label="More"
+                                    >
+                                       <span className="icon-[tabler--dots-vertical] size-5"></span>
+                                    </button>
+                                 </td>
+                              </tr>
+                           ))}
                      </tbody>
                   </table>
                </div>

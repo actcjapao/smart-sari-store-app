@@ -45,4 +45,20 @@ class UserStore extends Model
     {
         return ['uuid'];
     }
+
+    /**
+     * Get the user associated with this user store relationship.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the store associated with this user store relationship.
+     */
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
+    }
 }

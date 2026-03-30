@@ -74,4 +74,20 @@ class User extends Authenticatable
     {
         return ['uuid'];
     }
+
+    /**
+     * Get the stores associated with this user.
+     */
+    public function stores()
+    {
+        return $this->belongsToMany(Store::class, 'user_stores');
+    }
+
+    /**
+     * Get the user store pivot records.
+     */
+    public function userStores()
+    {
+        return $this->hasMany(UserStore::class);
+    }
 }

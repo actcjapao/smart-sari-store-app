@@ -47,4 +47,12 @@ class Store extends Model
     {
         return ['uuid'];
     }
+
+    /**
+     * Get the products for this store.
+     */
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
 }
