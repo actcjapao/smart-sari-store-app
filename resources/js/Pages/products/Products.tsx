@@ -1,17 +1,17 @@
 import MainPanelLayout from "@/components/MainPanelLayout";
-import { useForm, usePage } from "@inertiajs/react";
+import { useForm, usePage, Link } from "@inertiajs/react";
 import React, { useState, useEffect } from "react";
 import { Product } from "./types";
 import { PageProps } from "@/types/PageProp.type";
+import { Paginator } from "@/types/Paginator.type";
 import FlashAlert from "@/components/alert/FlashAlert";
 
-const Products = ({
-   store_id,
-   products,
-}: {
+type ProductsPageProps = {
    store_id: number;
-   products: Product[];
-}) => {
+   products: Paginator<Product>;
+};
+
+const Products = ({ store_id, products }: ProductsPageProps) => {
    const { flash } = usePage<PageProps>().props;
    const [tagInput, setTagInput] = useState("");
    const { data, setData, post, processing, errors, clearErrors, reset } =
@@ -37,10 +37,6 @@ const Products = ({
          window.HSStaticMethods.autoInit();
       }
    }, []);
-
-   useEffect(() => {
-      console.log("products", products);
-   }, [products]);
 
    const addTag = () => {
       const value = tagInput.trim().toLowerCase();
@@ -163,8 +159,8 @@ const Products = ({
                         </tr>
                      </thead>
                      <tbody>
-                        {products.length > 0 &&
-                           products.map((product) => (
+                        {products.data.length > 0 &&
+                           products.data.map((product) => (
                               <tr key={product.id} className="row-hover">
                                  <td className="font-medium">{product.name}</td>
                                  <td>{product.brand}</td>
@@ -200,9 +196,100 @@ const Products = ({
                                  </td>
                               </tr>
                            ))}
+                        {products.data.length === 0 && (
+                           <tr>
+                              <td colSpan={6} className="text-center py-8">
+                                 <p className="text-gray-500">
+                                    No products found
+                                 </p>
+                              </td>
+                           </tr>
+                        )}
                      </tbody>
                   </table>
                </div>
+
+               {/* Pagination */}
+               {products.last_page > 1 && (
+                  <div className="flex items-center justify-between mt-6 pt-4 border-t border-base-300">
+                     <div className="text-sm text-gray-500">
+                        Showing {products.from} to {products.to} of{" "}
+                        {products.total} products
+                     </div>
+
+                     <div className="flex gap-2">
+                        {/* Previous Button */}
+                        {products.prev_page_url ? (
+                           <Link
+                              href={products.prev_page_url}
+                              className="btn btn-sm btn-outline"
+                              preserveScroll
+                           >
+                              <span className="icon-[tabler--chevron-left] size-4"></span>
+                              Previous
+                           </Link>
+                        ) : (
+                           <button
+                              className="btn btn-sm btn-outline opacity-50 cursor-not-allowed"
+                              disabled
+                           >
+                              <span className="icon-[tabler--chevron-left] size-4"></span>
+                              Previous
+                           </button>
+                        )}
+
+                        {/* Page Numbers */}
+                        <div className="flex gap-1">
+                           {products.links.map((link, idx) => {
+                              // Skip the first and last links (prev/next)
+                              if (
+                                 link.label.includes("Previous") ||
+                                 link.label.includes("Next") ||
+                                 link.label === "&laquo;" ||
+                                 link.label === "&raquo;"
+                              ) {
+                                 return null;
+                              }
+
+                              return (
+                                 <Link
+                                    key={idx}
+                                    href={link.url || "#"}
+                                    className={`btn btn-sm ${
+                                       link.active
+                                          ? "btn-primary"
+                                          : "btn-outline"
+                                    }`}
+                                    preserveScroll
+                                 >
+                                    {link.label}
+                                 </Link>
+                              );
+                           })}
+                        </div>
+
+                        {/* Next Button */}
+                        {products.next_page_url ? (
+                           <Link
+                              href={products.next_page_url}
+                              className="btn btn-sm btn-outline"
+                              preserveScroll
+                           >
+                              Next
+                              <span className="icon-[tabler--chevron-right] size-4"></span>
+                           </Link>
+                        ) : (
+                           <button
+                              className="btn btn-sm btn-outline opacity-50 cursor-not-allowed"
+                              disabled
+                           >
+                              Next
+                              <span className="icon-[tabler--chevron-right] size-4"></span>
+                           </button>
+                        )}
+                     </div>
+                  </div>
+               )}
             </div>
          </div>
 
