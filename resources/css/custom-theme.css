@@ -1,0 +1,37 @@
+.custom-primary {
+   background-color: #00b74a; /* non-active from the image */
+   color: #ffffff;
+   border: 1px solid #00a03d;
+   box-shadow: 0 4px 8px rgba(0, 91, 0, 0.18);
+   transition:
+      background-color 0.15s ease,
+      transform 0.12s ease,
+      box-shadow 0.15s ease;
+}
+
+.custom-primary:hover,
+.custom-primary:focus {
+   background-color: #009e43; /* active color approximated from second image */
+   border-color: #008e3a;
+   box-shadow: 0 6px 12px rgba(0, 104, 0, 0.25);
+   transform: translateY(-1px);
+}
+
+.custom-primary:active {
+   background-color: #008637;
+   border-color: #007a30;
+   box-shadow: 0 2px 4px rgba(0, 99, 0, 0.3);
+   transform: translateY(0);
+}
+
+.custom-primary,
+button.custom-primary,
+a.custom-primary {
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   padding: 0.6rem 1rem;
+   text-decoration: none;
+   cursor: pointer;
+   font-weight: 600;
+}

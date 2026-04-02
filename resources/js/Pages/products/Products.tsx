@@ -134,7 +134,7 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
 
                   <button
                      data-theme="mintlify"
-                     className="btn btn-primary"
+                     className="btn btn-primary btn-sm py-5 px-6"
                      aria-haspopup="dialog"
                      aria-expanded="false"
                      aria-controls="product-modal"
@@ -146,72 +146,101 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
                   </button>
                </div>
 
-               <div className="w-full overflow-x-auto">
-                  <table className="table">
-                     <thead>
-                        <tr>
-                           <th>Name</th>
-                           <th>Brand</th>
-                           <th>Stock</th>
-                           <th>Price</th>
-                           <th>Tags</th>
-                           <th className="text-right">Actions</th>
-                        </tr>
-                     </thead>
-                     <tbody>
-                        {products.data.length > 0 &&
-                           products.data.map((product) => (
-                              <tr key={product.id} className="row-hover">
-                                 <td className="font-medium">{product.name}</td>
-                                 <td>{product.brand}</td>
-                                 <td>{product.stock_quantity}</td>
-                                 <td>{product.price}</td>
-                                 <td>{product.tags.join(", ")}</td>
-                                 <td className="text-right space-x-1">
-                                    <button
-                                       className="btn btn-circle btn-text btn-sm"
-                                       aria-label="Edit"
-                                       aria-controls="product-modal"
-                                       data-overlay="#product-modal"
-                                       onClick={() =>
-                                          openEditProductModal(product)
-                                       }
-                                    >
-                                       <span className="icon-[tabler--pencil] size-5"></span>
-                                    </button>
+               <div className="card w-full">
+                  <div className="overflow-x-auto">
+                     <table className="table table-sm">
+                        <thead>
+                           <tr>
+                              <th>Name</th>
+                              <th>Brand</th>
+                              <th>Stock</th>
+                              <th>Price</th>
+                              <th>Status</th>
+                              <th className="text-right">Actions</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {products.data.length > 0 ? (
+                              products.data.map((product) => {
+                                 const stockValue = Number(
+                                    product.stock_quantity,
+                                 );
+                                 const status =
+                                    stockValue > 15
+                                       ? {
+                                            label: "Available",
+                                            style: "badge-soft badge-success",
+                                         }
+                                       : stockValue > 0
+                                         ? {
+                                              label: "Low stock",
+                                              style: "badge-soft badge-warning",
+                                           }
+                                         : {
+                                              label: "Out of stock",
+                                              style: "badge-soft badge-error",
+                                           };
 
-                                    <button
-                                       className="btn btn-circle btn-text btn-sm"
-                                       aria-label="Delete"
-                                    >
-                                       <span className="icon-[tabler--trash] size-5"></span>
-                                    </button>
-
-                                    <button
-                                       className="btn btn-circle btn-text btn-sm"
-                                       aria-label="More"
-                                    >
-                                       <span className="icon-[tabler--dots-vertical] size-5"></span>
-                                    </button>
+                                 return (
+                                    <tr key={product.id}>
+                                       <td>{product.name}</td>
+                                       <td>{product.brand || "-"}</td>
+                                       <td>{product.stock_quantity}</td>
+                                       <td>
+                                          ${Number(product.price).toFixed(2)}
+                                       </td>
+                                       <td>
+                                          <span
+                                             className={`badge ${status.style} text-xs`}
+                                          >
+                                             {status.label}
+                                          </span>
+                                       </td>
+                                       <td className="text-right space-x-1">
+                                          <button
+                                             className="btn btn-circle btn-text btn-sm"
+                                             aria-label="Edit"
+                                             aria-controls="product-modal"
+                                             data-overlay="#product-modal"
+                                             onClick={() =>
+                                                openEditProductModal(product)
+                                             }
+                                          >
+                                             <span className="icon-[tabler--pencil] size-5"></span>
+                                          </button>
+                                          <button
+                                             className="btn btn-circle btn-text btn-sm"
+                                             aria-label="Delete"
+                                          >
+                                             <span className="icon-[tabler--trash] size-5"></span>
+                                          </button>
+                                          <button
+                                             className="btn btn-circle btn-text btn-sm"
+                                             aria-label="More"
+                                          >
+                                             <span className="icon-[tabler--dots-vertical] size-5"></span>
+                                          </button>
+                                       </td>
+                                    </tr>
+                                 );
+                              })
+                           ) : (
+                              <tr>
+                                 <td colSpan={6} className="text-center py-8">
+                                    <p className="text-base-content/50">
+                                       No products found
+                                    </p>
                                  </td>
                               </tr>
-                           ))}
-                        {products.data.length === 0 && (
-                           <tr>
-                              <td colSpan={6} className="text-center py-8">
-                                 <p className="text-gray-500">
-                                    No products found
-                                 </p>
-                              </td>
-                           </tr>
-                        )}
-                     </tbody>
-                  </table>
+                           )}
+                        </tbody>
+                     </table>
+                  </div>
                </div>
 
                {/* Pagination */}
                {products.last_page > 1 && (
-                  <div className="flex items-center justify-between mt-6 pt-4 border-t border-base-300">
+                  <div className="flex items-center justify-between mt-2 pt-4 border-base-300">
                      <div className="text-sm text-gray-500">
                         Showing {products.from} to {products.to} of{" "}
                         {products.total} products
@@ -257,7 +286,7 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
                                     href={link.url || "#"}
                                     className={`btn btn-sm ${
                                        link.active
-                                          ? "btn-primary"
+                                          ? "custom-primary"
                                           : "btn-outline"
                                     }`}
                                     preserveScroll
