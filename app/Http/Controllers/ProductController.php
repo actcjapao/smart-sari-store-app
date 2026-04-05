@@ -15,7 +15,7 @@ class ProductController extends Controller
     /**
      * Pagination limit for products per page
      */
-    private const PRODUCTS_PER_PAGE = 10;
+    private const PRODUCTS_PER_PAGE = 5;
 
     function loadPage() {
         $authenticatedUser = session('authenticated_user');

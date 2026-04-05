@@ -53,6 +53,15 @@ const MainPanelLayout = ({ children, title }: MainPanelLayoutProps) => {
                   </Link>
 
                   <Link
+                     data-theme={`${applyMintlifyTheme("/pos")}`}
+                     href="/pos"
+                     className={navLinkClass("/pos")}
+                  >
+                     <span className="icon-[tabler--cash-register] w-5 h-5 shrink-0"></span>
+                     POS
+                  </Link>
+
+                  <Link
                      data-theme={`${applyMintlifyTheme("/products")}`}
                      href="/products"
                      className={navLinkClass("/products")}
