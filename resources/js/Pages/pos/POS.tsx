@@ -2,11 +2,7 @@ import MainPanelLayout from "@/components/MainPanelLayout";
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { Product } from "@/Pages/products/types";
-
-interface CartItem {
-   product: Product;
-   quantity: number;
-}
+import CartItem from "./types";
 
 const Products = () => {
    const [query, setQuery] = useState<string>("");
@@ -148,7 +144,7 @@ const Products = () => {
                                  >
                                     <span>{product.name}</span>
                                     <span className="text-sm text-gray-500">
-                                       ${product.price}
+                                       ₱{product.price}
                                     </span>
                                  </div>
                               ))}
@@ -172,7 +168,7 @@ const Products = () => {
                                     Price
                                  </label>
                                  <p className="text-base-content">
-                                    ${Number(selectedProduct.price).toFixed(2)}
+                                    ₱{Number(selectedProduct.price).toFixed(2)}
                                  </p>
                               </div>
                               <div>
@@ -264,13 +260,13 @@ const Products = () => {
                                           <td>{item.product.name}</td>
                                           <td>{item.quantity}</td>
                                           <td>
-                                             $
+                                             ₱
                                              {Number(
                                                 item.product.price,
                                              ).toFixed(2)}
                                           </td>
                                           <td>
-                                             $
+                                             ₱
                                              {(
                                                 item.product.price *
                                                 item.quantity
@@ -308,7 +304,7 @@ const Products = () => {
                            <label className="block text-sm font-medium">
                               Total Amount
                            </label>
-                           <p className="text-lg font-bold">$13.00</p>
+                           <p className="text-lg font-bold">₱13.00</p>
                         </div>
                         <div>
                            <label className="block text-sm font-medium">
@@ -327,7 +323,7 @@ const Products = () => {
                            <label className="block text-sm font-medium">
                               Change
                            </label>
-                           <p className="text-lg">$0.00</p>
+                           <p className="text-lg">₱0.00</p>
                         </div>
                         <button
                            data-theme="mintlify"

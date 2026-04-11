@@ -187,7 +187,7 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
                                        <td>{product.brand || "-"}</td>
                                        <td>{product.stock_quantity}</td>
                                        <td>
-                                          ${Number(product.price).toFixed(2)}
+                                          ₱{Number(product.price).toFixed(2)}
                                        </td>
                                        <td>
                                           <span
