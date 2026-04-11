@@ -1,17 +1,7 @@
 import MainPanelLayout from "@/components/MainPanelLayout";
-// import { usePage } from "@inertiajs/react";
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-// import { PageProps } from "@/types/PageProp.type";
-
-interface Product {
-   uuid: string;
-   name: string;
-   price: number;
-   stock_quantity: number;
-   brand: string;
-   tags: string[];
-}
+import { Product } from "@/Pages/products/types";
 
 interface CartItem {
    product: Product;
