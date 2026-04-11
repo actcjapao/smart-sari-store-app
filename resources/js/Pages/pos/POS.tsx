@@ -14,6 +14,7 @@ const Products = () => {
    const [quantity, setQuantity] = useState<string>("1");
    const [invalidQuantity, setInvalidQuantity] = useState<boolean>(false);
    const [cash, setCash] = useState<string>("");
+   const [isDebt, setIsDebt] = useState<boolean>(false);
 
    const calculateTotalAmount = () => {
       return cartItems.reduce((total, item) => {
@@ -347,6 +348,24 @@ const Products = () => {
                         >
                            Proceed
                         </button>
+                        <div>
+                           <div className="flex items-center gap-1">
+                              <input
+                                 data-theme="mintlify"
+                                 id="isDebtCheckbox1"
+                                 type="checkbox"
+                                 className="checkbox checkbox-primary checkbox-sm"
+                                 checked={isDebt}
+                                 onChange={(e) => setIsDebt(e.target.checked)}
+                              />
+                              <label
+                                 className="label-text"
+                                 htmlFor="isDebtCheckbox1"
+                              >
+                                 Process as Debt
+                              </label>
+                           </div>
+                        </div>
                      </div>
                   </div>
                </div>
