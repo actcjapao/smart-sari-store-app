@@ -182,7 +182,7 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
                                            };
 
                                  return (
-                                    <tr key={product.id}>
+                                    <tr key={product.uuid}>
                                        <td>{product.name}</td>
                                        <td>{product.brand || "-"}</td>
                                        <td>{product.stock_quantity}</td>
