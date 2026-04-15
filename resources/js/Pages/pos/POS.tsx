@@ -14,6 +14,7 @@ const Products = () => {
    const [quantity, setQuantity] = useState<string>("1");
    const [invalidQuantity, setInvalidQuantity] = useState<boolean>(false);
    const [cash, setCash] = useState<string>("");
+   const [invalidCashAmount, setInvalidCashAmount] = useState<boolean>(false);
    const [isDebt, setIsDebt] = useState<boolean>(false);
 
    const calculateTotalAmount = () => {
@@ -129,6 +130,28 @@ const Products = () => {
          window.HSStaticMethods.autoInit();
       }
    }, []);
+
+   const processItems = () => {
+      if (!isDebt && (cash === "" || change < 0)) {
+         setInvalidCashAmount(true);
+         return;
+      }
+
+      // Here you would typically send the cartItems, totalAmount, and payment details to your backend for processing
+      console.log("Processing items:", {
+         cartItems,
+         totalAmount,
+         cash: isDebt ? "N/A (Debt)" : cashAmount,
+         change: isDebt ? "N/A (Debt)" : change,
+      });
+
+      // Reset the form after processing
+      setCartItems([]);
+      setSelectedProduct(null);
+      setQuery("");
+      setCash("");
+      setIsDebt(false);
+   };
 
    return (
       <>
@@ -287,15 +310,15 @@ const Products = () => {
                                           </td>
                                           <td className="text-right">
                                              <button
-                                                data-theme="mintlify"
-                                                className="btn btn-sm btn-error"
+                                                className="btn btn-circle btn-text btn-sm"
+                                                aria-label="Delete"
                                                 onClick={() =>
                                                    handleRemoveItem(
                                                       item.product.uuid,
                                                    )
                                                 }
                                              >
-                                                Remove
+                                                <span className="icon-[tabler--trash] size-5"></span>
                                              </button>
                                           </td>
                                        </tr>
@@ -321,32 +344,47 @@ const Products = () => {
                               ₱{totalAmount.toFixed(2)}
                            </p>
                         </div>
-                        <div>
-                           <label className="block text-sm font-medium">
-                              Cash
-                           </label>
-                           <input
-                              data-theme="mintlify"
-                              type="number"
-                              className="input input-bordered w-full"
-                              placeholder="Enter cash amount"
-                              min="0"
-                              step="0.01"
-                              value={cash}
-                              onChange={(e) => setCash(e.target.value)}
-                           />
-                        </div>
-                        <div>
-                           <label className="block text-sm font-medium">
-                              Change
-                           </label>
-                           <p className="text-lg">₱{change.toFixed(2)}</p>
-                        </div>
+                        {!isDebt && (
+                           <div>
+                              <label className="block text-sm font-medium">
+                                 Cash
+                              </label>
+                              <input
+                                 data-theme="mintlify"
+                                 type="number"
+                                 className={`input input-bordered w-full ${invalidCashAmount ? "is-invalid" : ""}`}
+                                 placeholder="Enter cash amount"
+                                 min="0"
+                                 step="0.01"
+                                 value={cash}
+                                 disabled={cartItems.length === 0}
+                                 onChange={(e) => {
+                                    setInvalidCashAmount(false);
+                                    setCash(e.target.value);
+                                 }}
+                              />
+                              {invalidCashAmount && (
+                                 <p className="text-sm text-error mt-1">
+                                    Please enter a valid cash amount.
+                                 </p>
+                              )}
+                           </div>
+                        )}
+                        {!isDebt && (
+                           <div>
+                              <label className="block text-sm font-medium">
+                                 Change
+                              </label>
+                              <p className="text-lg">₱{change.toFixed(2)}</p>
+                           </div>
+                        )}
                         <button
                            data-theme="mintlify"
                            className="btn btn-primary w-full"
+                           onClick={processItems}
+                           disabled={cartItems.length === 0}
                         >
-                           Proceed
+                           Process
                         </button>
                         <div>
                            <div className="flex items-center gap-1">
