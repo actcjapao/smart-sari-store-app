@@ -155,8 +155,10 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
                            <tr>
                               <th>Name</th>
                               <th>Brand</th>
-                              <th>Stock</th>
+                              <th>Cost Price</th>
                               <th>Selling Price</th>
+                              <th>Profit</th>
+                              <th>Stock</th>
                               <th>Status</th>
                               <th className="text-right">Actions</th>
                            </tr>
@@ -187,13 +189,26 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
                                     <tr key={product.uuid}>
                                        <td>{product.name}</td>
                                        <td>{product.brand || "-"}</td>
-                                       <td>{product.stock_quantity}</td>
+                                       <td>
+                                          ₱
+                                          {Number(product.cost_price).toFixed(
+                                             2,
+                                          )}
+                                       </td>
                                        <td>
                                           ₱
                                           {Number(
                                              product.selling_price,
                                           ).toFixed(2)}
                                        </td>
+                                       <td>
+                                          ₱
+                                          {(
+                                             Number(product.selling_price) -
+                                             Number(product.cost_price)
+                                          ).toFixed(2)}
+                                       </td>
+                                       <td>{product.stock_quantity}</td>
                                        <td>
                                           <span
                                              className={`badge ${status.style} text-xs`}
@@ -202,6 +217,17 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
                                           </span>
                                        </td>
                                        <td className="text-right space-x-1">
+                                          <button
+                                             className="btn btn-circle btn-text btn-sm"
+                                             aria-label="Add stocks"
+                                             // aria-controls="product-modal"
+                                             // data-overlay="#product-modal"
+                                             onClick={() =>
+                                                alert("Ready to add stocks")
+                                             }
+                                          >
+                                             <span className="icon-[tabler--cube-plus] size-5"></span>
+                                          </button>
                                           <button
                                              className="btn btn-circle btn-text btn-sm"
                                              aria-label="Edit"
@@ -231,7 +257,7 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
                               })
                            ) : (
                               <tr>
-                                 <td colSpan={6} className="text-center py-8">
+                                 <td colSpan={8} className="text-center py-8">
                                     <p className="text-base-content/50">
                                        No products found
                                     </p>
