@@ -16,7 +16,12 @@ const Products = () => {
    const [invalidQuantity, setInvalidQuantity] = useState<boolean>(false);
    const [cash, setCash] = useState<string>("");
    const [invalidCashAmount, setInvalidCashAmount] = useState<boolean>(false);
+
    const [isDebt, setIsDebt] = useState<boolean>(false);
+   const [invalidCustomerName, setInvalidCustomerName] =
+      useState<boolean>(false);
+   const [customerName, setCustomerName] = useState<string>("");
+   const [dueDate, setDueDate] = useState<Date | undefined>();
 
    const [processSaleResponse, setProcessSaleResponse] = useState<
       ProcessSaleResponse | undefined
@@ -376,38 +381,81 @@ const Products = () => {
                            </p>
                         </div>
                         {!isDebt && (
-                           <div>
-                              <label className="block text-sm font-medium">
-                                 Cash
-                              </label>
-                              <input
-                                 data-theme="mintlify"
-                                 type="number"
-                                 className={`input input-bordered w-full ${invalidCashAmount ? "is-invalid" : ""}`}
-                                 placeholder="Enter cash amount"
-                                 min="0"
-                                 step="0.01"
-                                 value={cash}
-                                 disabled={cartItems.length === 0}
-                                 onChange={(e) => {
-                                    setInvalidCashAmount(false);
-                                    setCash(e.target.value);
-                                 }}
-                              />
-                              {invalidCashAmount && (
-                                 <p className="text-sm text-error mt-1">
-                                    Please enter a valid cash amount.
-                                 </p>
-                              )}
-                           </div>
+                           <>
+                              <div>
+                                 <label className="block text-sm font-medium">
+                                    Cash
+                                 </label>
+                                 <input
+                                    data-theme="mintlify"
+                                    type="number"
+                                    className={`input input-bordered w-full mt-1 ${invalidCashAmount ? "is-invalid" : ""}`}
+                                    placeholder="Enter cash amount"
+                                    min="0"
+                                    step="0.01"
+                                    value={cash}
+                                    disabled={cartItems.length === 0}
+                                    onChange={(e) => {
+                                       setInvalidCashAmount(false);
+                                       setCash(e.target.value);
+                                    }}
+                                 />
+                                 {invalidCashAmount && (
+                                    <p className="text-sm text-error mt-1">
+                                       Please enter a valid cash amount.
+                                    </p>
+                                 )}
+                              </div>
+                              <div>
+                                 <label className="block text-sm font-medium">
+                                    Change
+                                 </label>
+                                 <p className="text-lg">₱{change.toFixed(2)}</p>
+                              </div>
+                           </>
                         )}
-                        {!isDebt && (
-                           <div>
-                              <label className="block text-sm font-medium">
-                                 Change
-                              </label>
-                              <p className="text-lg">₱{change.toFixed(2)}</p>
-                           </div>
+                        {isDebt && (
+                           <>
+                              <div>
+                                 <label className="block text-sm font-medium">
+                                    Customer Name
+                                 </label>
+                                 <input
+                                    data-theme="mintlify"
+                                    type="text"
+                                    className={`input input-bordered w-full mt-1 ${invalidCustomerName ? "is-invalid" : ""}`}
+                                    placeholder="e.g., Juan dela Cruz"
+                                    value={customerName}
+                                    disabled={cartItems.length === 0}
+                                    onChange={(e) => {
+                                       setInvalidCustomerName(false);
+                                       setCustomerName(e.target.value);
+                                    }}
+                                 />
+                                 {invalidCustomerName && (
+                                    <p className="text-sm text-error mt-1">
+                                       Customer name is required.
+                                    </p>
+                                 )}
+
+                                 <label className="block text-sm font-medium mt-2">
+                                    Due date{" "}
+                                    <small>
+                                       (<i>optional</i>)
+                                    </small>
+                                 </label>
+                                 <input
+                                    data-theme="mintlify"
+                                    type="date"
+                                    className={`input input-bordered w-full mt-1`}
+                                    value={customerName}
+                                    disabled={cartItems.length === 0}
+                                    onChange={(e) => {
+                                       setCustomerName(e.target.value);
+                                    }}
+                                 />
+                              </div>
+                           </>
                         )}
                         {processSaleResponse !== undefined && (
                            <SaleProcessingAlert
