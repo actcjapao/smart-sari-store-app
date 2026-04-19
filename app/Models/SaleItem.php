@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class SaleItem extends Model
 {
@@ -34,6 +35,19 @@ class SaleItem extends Model
         'unit_price',
         'total_price',
     ];
+
+    /**
+     * Tell Laravel which column is the UUID to auto-generate.
+     * 
+     * Laravel will check if uses HasUuids trait before calling this method.
+     * If HasUuids trait exist in this model, it will check if uniqueIds() method exist.
+     * If uniqueIds() method exist, it will use the returned array to know
+     * which columns are UUIDs and auto-generate them.
+     */
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
     
     /**
      * Get the sale this item belongs to.

@@ -1,6 +1,13 @@
+import { BaseResponse } from "@/common/types";
 import { Product } from "@/Pages/products/types";
 
-export default interface CartItem {
+export interface CartItem {
    product: Product;
    quantity: number;
 }
+
+export type ProcessSaleResponse =
+   | (BaseResponse & {
+        sale_uuid: string;
+     })
+   | BaseResponse;

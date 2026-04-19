@@ -4,10 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 use App\Models\Product;
 use App\Models\User;
 use App\Models\UserStore;
+use App\Models\Sale;
+use App\Models\SaleItem;
 
 class POSController extends Controller
 {
@@ -36,8 +40,100 @@ class POSController extends Controller
                           ->select(['uuid', 'name', 'cost_price', 'selling_price', 'stock_quantity', 'brand', 'tags'])
                           ->limit(10)
                           ->get();
-        Log::info("Products loaded for store", ['products' => $products]);
 
         return response()->json($products);
+    }
+
+    function processSale(Request $request) {
+        $data = $request->validate([
+            'items' => ['required', 'array'],
+            'items.*.product.uuid' => ['required', 'uuid', 'exists:products,uuid'],
+            'items.*.quantity' => ['required', 'integer', 'min:1'],
+            'total_amount' => ['required', 'numeric', 'min:0'],
+            'payment_amount' => ['required', 'numeric', 'min:0'],
+            'change_amount' => ['required', 'numeric', 'min:0'],
+        ]);
+
+        DB::beginTransaction();
+        
+        $authenticatedUser = session('authenticated_user');
+        $userUuid = $authenticatedUser->uuid;
+
+        $user = User::with('userStores:user_id,store_id')
+                    ->where('uuid', $userUuid)
+                    ->firstOrFail();
+        
+        $userId = $user->userStores->first()->user_id;
+        $storeId = $user->userStores->first()->store_id;
+
+        try {
+            // 1. Create Sale
+            $sale = Sale::create([
+                'user_id' => $userId,
+                'store_id' => $storeId,
+                'total_amount' => $data['total_amount'],
+                'payment_amount' => $data['payment_amount'],
+                'change_amount' => $data['change_amount'],
+                'status' => 'completed',
+            ]);
+
+            // 2. Loop items
+            foreach ($data['items'] as $item) {
+
+                // Lock row for update (important for concurrency)
+                $product = Product::where('uuid', $item['product']['uuid'])
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                // 3. Check stock
+                if ($product->stock_quantity < $item['quantity']) {
+                    // Goes to HttpException catch block
+                    throw new HttpException(400, "Insufficient stock for '{$product->name}'");
+                }
+
+                $unitPrice = $product->selling_price;
+                $totalPrice = $unitPrice * $item['quantity'];
+
+                // 4. Create Sale Item
+                SaleItem::create([
+                    'sale_id' => $sale->id,
+                    'product_id' => $product->id,
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $unitPrice,
+                    'total_price' => $totalPrice,
+                ]);
+
+                // 5. Deduct stock (automatically updates updated_at)
+                $product->decrement('stock_quantity', $item['quantity']);
+            }
+
+            DB::commit();
+            
+            return response()->json([   
+                'data' => [
+                    'key' => 'success',
+                    'message' => 'Sale processed successfully!',
+                    'sale_uuid' => $sale->uuid,
+                ],
+            ], 201);
+        } catch (HttpException $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'key' => 'error',
+                'message' => $e->getMessage(),
+            ], $e->getStatusCode());
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            Log::error('Sale processing failed', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'message' => 'Failed to process sale',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

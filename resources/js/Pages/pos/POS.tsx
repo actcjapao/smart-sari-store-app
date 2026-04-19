@@ -2,7 +2,9 @@ import MainPanelLayout from "@/components/MainPanelLayout";
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { Product } from "@/Pages/products/types";
-import CartItem from "./types";
+import { CartItem, ProcessSaleResponse } from "./types";
+import { ResponseKey } from "@/common/enums";
+import SaleProcessingAlert from "./SaleProcessingAlert";
 
 const Products = () => {
    const [query, setQuery] = useState<string>("");
@@ -16,6 +18,10 @@ const Products = () => {
    const [cash, setCash] = useState<string>("");
    const [invalidCashAmount, setInvalidCashAmount] = useState<boolean>(false);
    const [isDebt, setIsDebt] = useState<boolean>(false);
+
+   const [processSaleResponse, setProcessSaleResponse] = useState<
+      ProcessSaleResponse | undefined
+   >();
 
    const calculateTotalAmount = () => {
       return cartItems.reduce((total, item) => {
@@ -114,6 +120,8 @@ const Products = () => {
             { product: selectedProduct, quantity: normalizedQuantity },
          ];
       });
+
+      setSelectedProduct(null);
    };
 
    const handleRemoveItem = (productUuid: string) => {
@@ -131,32 +139,53 @@ const Products = () => {
       }
    }, []);
 
-   const processItems = () => {
+   const processItems = async () => {
       if (!isDebt && (cash === "" || change < 0)) {
          setInvalidCashAmount(true);
          return;
       }
 
-      // Here you would typically send the cartItems, totalAmount, and payment details to your backend for processing
-      console.log("Processing items:", {
-         cartItems,
-         totalAmount,
-         cash: isDebt ? "N/A (Debt)" : cashAmount,
-         change: isDebt ? "N/A (Debt)" : change,
-      });
+      try {
+         const response = await axios.post("/api/sale", {
+            items: cartItems,
+            total_amount: totalAmount,
+            payment_amount: cashAmount,
+            change_amount: change,
+         });
 
-      // Reset the form after processing
-      setCartItems([]);
-      setSelectedProduct(null);
-      setQuery("");
-      setCash("");
-      setIsDebt(false);
+         if (response.status === 201) {
+            const { data } = response.data;
+            setProcessSaleResponse({
+               key: ResponseKey.Success,
+               status_code: 201,
+               message: data.message,
+               sale_uuid: data.sale_uuid,
+            });
+         }
+
+         // Reset after success
+         setCartItems([]);
+         setSelectedProduct(null);
+         setQuery("");
+         setCash("");
+         setIsDebt(false);
+      } catch (error) {
+         if (axios.isAxiosError(error)) {
+            setProcessSaleResponse({
+               key: ResponseKey.Error,
+               status_code: error.response?.status ?? 500,
+               message: error.response?.data.message,
+            });
+         } else {
+            console.error("Unexpected error:", error);
+         }
+      }
    };
 
    return (
       <>
          <div className="flex gap-4">
-            <div className="w-3/4">
+            <div className="w-[70%]">
                <div className="card bg-base-100 shadow-sm">
                   <div className="card-body">
                      <div className="relative max-w-sm">
@@ -334,7 +363,7 @@ const Products = () => {
                   </div>
                </div>
             </div>
-            <div className="w-1/4">
+            <div className="w-[30%]">
                <div className="card bg-base-100 shadow-sm">
                   <div className="card-body">
                      <h3 className="card-title">Summary</h3>
@@ -380,6 +409,11 @@ const Products = () => {
                               </label>
                               <p className="text-lg">₱{change.toFixed(2)}</p>
                            </div>
+                        )}
+                        {processSaleResponse !== undefined && (
+                           <SaleProcessingAlert
+                              processSaleResponse={processSaleResponse}
+                           />
                         )}
                         <button
                            data-theme="mintlify"
