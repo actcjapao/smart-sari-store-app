@@ -21,7 +21,7 @@ const Products = () => {
    const [invalidCustomerName, setInvalidCustomerName] =
       useState<boolean>(false);
    const [customerName, setCustomerName] = useState<string>("");
-   const [dueDate, setDueDate] = useState<Date | undefined>();
+   const [dueDate, setDueDate] = useState<string>("");
 
    const [processSaleResponse, setProcessSaleResponse] = useState<
       ProcessSaleResponse | undefined
@@ -143,8 +143,8 @@ const Products = () => {
       }
    }, []);
 
-   const processItems = async () => {
-      if (!isDebt && (cash === "" || change < 0)) {
+   const processSale = async () => {
+      if (cash === "" || change < 0) {
          setInvalidCashAmount(true);
          return;
       }
@@ -183,6 +183,19 @@ const Products = () => {
          } else {
             console.error("Unexpected error:", error);
          }
+      }
+   };
+
+   const processItems = async () => {
+      if (isDebt) {
+         alert(
+            "Processing as debt. Customer Name: " +
+               customerName +
+               ", Due Date: " +
+               dueDate,
+         );
+      } else {
+         processSale();
       }
    };
 
@@ -448,11 +461,9 @@ const Products = () => {
                                     data-theme="mintlify"
                                     type="date"
                                     className={`input input-bordered w-full mt-1`}
-                                    value={customerName}
+                                    value={dueDate}
                                     disabled={cartItems.length === 0}
-                                    onChange={(e) => {
-                                       setCustomerName(e.target.value);
-                                    }}
+                                    onChange={(e) => setDueDate(e.target.value)}
                                  />
                               </div>
                            </>
@@ -479,6 +490,7 @@ const Products = () => {
                                  className="checkbox checkbox-primary checkbox-sm"
                                  checked={isDebt}
                                  onChange={(e) => setIsDebt(e.target.checked)}
+                                 disabled={cartItems.length === 0}
                               />
                               <label
                                  className="label-text"

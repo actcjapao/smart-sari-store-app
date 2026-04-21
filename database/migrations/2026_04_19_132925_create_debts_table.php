@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('customer_name');
             $table->decimal('total_amount', 10, 2)->default(0.00);
             $table->decimal('balance_due', 10, 2)->default(0.00);
-            $table->dateTime('due_date')->nullable();
+            $table->string('due_date')->nullable();
             $table->string('status')->default('open'); // (open, paid, partial, overdue)
 
             $table->timestamps();
