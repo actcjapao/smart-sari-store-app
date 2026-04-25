@@ -1,8 +1,9 @@
 import MainPanelLayout from "@/components/MainPanelLayout";
 import React, { useEffect, useState, useCallback } from "react";
-import axios from "axios";
+import axios, { HttpStatusCode } from "axios";
+import { BaseResponse } from "@/common/types";
 import { Product } from "@/Pages/products/types";
-import { CartItem, ProcessDebtResponse, ProcessSaleResponse } from "./types";
+import { CartItem } from "./types";
 import ProcessingAlert from "./ProcessingAlert";
 
 const Products = () => {
@@ -23,11 +24,8 @@ const Products = () => {
    const [customerName, setCustomerName] = useState<string>("");
    const [dueDate, setDueDate] = useState<string>("");
 
-   const [processSaleResponse, setProcessSaleResponse] = useState<
-      ProcessSaleResponse | undefined
-   >();
-   const [processDebtResponse, setProcessDebtResponse] = useState<
-      ProcessDebtResponse | undefined
+   const [processResponse, setProcessResponse] = useState<
+      BaseResponse | undefined
    >();
    const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
@@ -149,6 +147,7 @@ const Products = () => {
 
    const processDebt = async (): Promise<boolean> => {
       if (customerName === "") {
+         setIsProcessing(false);
          setInvalidCustomerName(true);
          return false;
       }
@@ -164,11 +163,10 @@ const Products = () => {
 
          if (response.status === 201) {
             const { data } = response.data;
-            setProcessDebtResponse({
+            setProcessResponse({
                key: data.key,
                status_code: 201,
                message: data.message,
-               debt_uuid: data.debt_uuid,
             });
 
             // Reset after success
@@ -181,7 +179,7 @@ const Products = () => {
          return false;
       } catch (error) {
          if (axios.isAxiosError(error)) {
-            setProcessDebtResponse({
+            setProcessResponse({
                key: error.response?.data.key ?? "error",
                status_code: error.response?.status ?? 500,
                message:
@@ -198,6 +196,7 @@ const Products = () => {
 
    const processSale = async (): Promise<boolean> => {
       if (cash === "" || change < 0) {
+         setIsProcessing(false);
          setInvalidCashAmount(true);
          return false;
       }
@@ -212,11 +211,10 @@ const Products = () => {
 
          if (response.status === 201) {
             const { data } = response.data;
-            setProcessSaleResponse({
+            setProcessResponse({
                key: data.key,
                status_code: 201,
                message: data.message,
-               sale_uuid: data.sale_uuid,
             });
 
             // Reset after success
@@ -228,7 +226,7 @@ const Products = () => {
          return false;
       } catch (error) {
          if (axios.isAxiosError(error)) {
-            setProcessSaleResponse({
+            setProcessResponse({
                key: error.response?.data.key ?? "error",
                status_code: error.response?.status ?? 500,
                message:
@@ -248,7 +246,11 @@ const Products = () => {
 
       if (cartItems.length === 0) {
          setIsProcessing(false);
-         alert("No items in the cart to process.");
+         setProcessResponse({
+            key: "error",
+            status_code: 400 as HttpStatusCode,
+            message: "No items in the cart to process.",
+         });
          return;
       }
 
@@ -265,28 +267,16 @@ const Products = () => {
    };
 
    useEffect(() => {
-      if (!processSaleResponse) {
+      if (!processResponse) {
          return;
       }
 
       const timer = setTimeout(() => {
-         setProcessSaleResponse(undefined);
+         setProcessResponse(undefined);
       }, 5000);
 
       return () => clearTimeout(timer);
-   }, [processSaleResponse]);
-
-   useEffect(() => {
-      if (!processDebtResponse) {
-         return;
-      }
-
-      const timer = setTimeout(() => {
-         setProcessDebtResponse(undefined);
-      }, 5000);
-
-      return () => clearTimeout(timer);
-   }, [processDebtResponse]);
+   }, [processResponse]);
 
    return (
       <>
@@ -557,12 +547,8 @@ const Products = () => {
                               </div>
                            </>
                         )}
-                        {(processSaleResponse || processDebtResponse) && (
-                           <ProcessingAlert
-                              response={
-                                 processSaleResponse ?? processDebtResponse!
-                              }
-                           />
+                        {processResponse && (
+                           <ProcessingAlert response={processResponse} />
                         )}
                         <button
                            data-theme="mintlify"

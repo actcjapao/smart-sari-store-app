@@ -1,10 +1,6 @@
-import { ProcessDebtResponse, ProcessSaleResponse } from "./types";
+import { BaseResponse } from "@/common/types";
 
-const ProcessingAlert = ({
-   response,
-}: {
-   response: ProcessSaleResponse | ProcessDebtResponse;
-}) => {
+const ProcessingAlert = ({ response }: { response: BaseResponse }) => {
    const isSuccess = response.key === "success" && response.status_code === 201;
 
    const config = isSuccess
