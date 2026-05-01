@@ -27,7 +27,7 @@ const Reports = () => {
                </label>
                <select
                   data-theme="mintlify"
-                  className="select mt-1"
+                  className="select mt-2"
                   id="favorite-simpson"
                   value={dateRange}
                   onChange={handleChange}
@@ -47,7 +47,7 @@ const Reports = () => {
                      <input
                         data-theme="mintlify"
                         type="date"
-                        className={`input input-bordered w-full mt-1`}
+                        className={`input input-bordered w-full mt-2`}
                         value={""}
                         disabled={false}
                         onChange={() => {}}
@@ -60,7 +60,7 @@ const Reports = () => {
                      <input
                         data-theme="mintlify"
                         type="date"
-                        className={`input input-bordered w-full mt-1`}
+                        className={`input input-bordered w-full mt-2`}
                         value={""}
                         disabled={false}
                         onChange={() => {}}
@@ -71,7 +71,7 @@ const Reports = () => {
             <div className={`w-[10%]`}>
                <button
                   data-theme="mintlify"
-                  className="btn btn-primary mt-8 w-full"
+                  className="btn btn-primary mt-9 w-full"
                   onClick={() => alert("Ready!")}
                   disabled={false}
                >
@@ -79,8 +79,10 @@ const Reports = () => {
                </button>
             </div>
          </div>
-         <div className="flex gap-4 mt-5">
-            <div className="w-[30%]">
+
+         <h5 className="font-semibold mt-5">Summary</h5>
+         <div className="flex gap-4 mt-2">
+            <div className="w-[33%]">
                {/* Single card */}
                <StatusCard
                   label="Sales"
@@ -90,7 +92,7 @@ const Reports = () => {
                   tooltip="Total sales for the selected date range"
                />
             </div>
-            <div className="w-[30%]">
+            <div className="w-[33%]">
                {/* Single card */}
                <StatusCard
                   label="Cost"
@@ -100,7 +102,7 @@ const Reports = () => {
                   tooltip="Total cost of goods sold within the selected date range."
                />
             </div>
-            <div className="w-[30%]">
+            <div className="w-[33%]">
                {/* Single card */}
                <StatusCard
                   label="Profit"
@@ -109,6 +111,45 @@ const Reports = () => {
                   colorClasses="text-success bg-success/20"
                   tooltip="Total profit for the selected date range"
                />
+            </div>
+         </div>
+         <div className="mt-5">
+            <h5 className="font-semibold mb-1">Sales Record</h5>
+            <div className="card w-full mt-2">
+               <div className="overflow-x-auto">
+                  <table className="table table-sm">
+                     <thead>
+                        <tr>
+                           <th>Date</th>
+                           <th>Method</th>
+                           <th>Total</th>
+                           <th>Payment</th>
+                           <th>Change</th>
+                           <th className="text-right">Actions</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr>
+                           <td>2024-06-01</td>
+                           <td>Cash</td>
+                           <td>₱ 1,000</td>
+                           <td>₱ 1,000</td>
+                           <td>₱ 0</td>
+                           <td className="text-right space-x-1">
+                              <button
+                                 className="btn btn-circle btn-text btn-sm"
+                                 aria-label="Add stocks"
+                                 // aria-controls="product-modal"
+                                 // data-overlay="#product-modal"
+                                 onClick={() => alert("Ready to add stocks")}
+                              >
+                                 <span className="icon-[tabler--list-details] size-5"></span>
+                              </button>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
             </div>
          </div>
       </>
