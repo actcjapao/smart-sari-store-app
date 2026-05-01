@@ -2,7 +2,7 @@ import MainPanelLayout from "@/components/MainPanelLayout";
 import React, { useEffect, useState } from "react";
 import StatusCard from "./StatusCard";
 
-const Sales = () => {
+const Reports = () => {
    // Reinitialize FlyonUI when component mounts
    // Without this, the modal won't work when navigating to this page via Inertia links
    useEffect(() => {
@@ -115,8 +115,8 @@ const Sales = () => {
    );
 };
 
-Sales.layout = (page: React.ReactNode) => (
-   <MainPanelLayout title="Sales">{page}</MainPanelLayout>
+Reports.layout = (page: React.ReactNode) => (
+   <MainPanelLayout title="Reports">{page}</MainPanelLayout>
 );
 
-export default Sales;
+export default Reports;

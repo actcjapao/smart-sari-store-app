@@ -8,7 +8,7 @@ use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\POSController;
-use App\Http\Controllers\SaleController;
+use App\Http\Controllers\ReportController;
 
 // Temp Route --> This route is intended for managing session data
 Route::get('/session/{operation?}', function($operation = null){
@@ -49,7 +49,7 @@ Route::get('/login', [AuthenticationController::class, 'loadPage'])->name('login
 Route::get('/dashboard', [DashboardController::class, 'loadPage'])->name('dashboard.page.load');
 Route::get('/products', [ProductController::class, 'loadPage'])->name('products.page.load');
 Route::get('/pos', [POSController::class, 'loadPage'])->name('pos.page.load');
-Route::get('/sales', [SaleController::class, 'loadPage'])->name('sales.page.load');
+Route::get('/reports', [ReportController::class, 'loadPage'])->name('reports.page.load');
 
 // API Routes
 Route::post('/api/register', [RegistrationController::class, 'register'])->name('registration');
