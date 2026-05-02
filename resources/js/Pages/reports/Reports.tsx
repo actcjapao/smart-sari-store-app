@@ -1,22 +1,90 @@
 import MainPanelLayout from "@/components/MainPanelLayout";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import StatusCard from "./StatusCard";
+import { SaleRecord, Summary } from "./types";
 
 const Reports = () => {
-   // Reinitialize FlyonUI when component mounts
-   // Without this, the modal won't work when navigating to this page via Inertia links
-   useEffect(() => {
-      // Access the global FlyonUI/HSStaticMethods
-      if (window.HSStaticMethods) {
-         window.HSStaticMethods.autoInit();
+   const [dateRange, setDateRange] = useState<string>("Today");
+   const [customStartDate, setCustomStartDate] = useState<string>("");
+   const [customEndDate, setCustomEndDate] = useState<string>("");
+   const [sales, setSales] = useState<SaleRecord[]>([]);
+   const [summary, setSummary] = useState<Summary>({
+      total_sales: 0,
+      total_cost: 0,
+      total_profit: 0,
+   });
+   const [isLoading, setIsLoading] = useState<boolean>(false);
+   const [fetchError, setFetchError] = useState<string>("");
+
+   const formatCurrency = (value: number) =>
+      `₱ ${value.toLocaleString(undefined, {
+         minimumFractionDigits: 2,
+         maximumFractionDigits: 2,
+      })}`;
+
+   const formatDate = (value: string) => {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) {
+         return value;
       }
+      return date.toLocaleDateString();
+   };
+
+   const fetchReports = async () => {
+      if (dateRange === "Custom" && (!customStartDate || !customEndDate)) {
+         setFetchError("Please select both start and end dates.");
+         return;
+      }
+
+      setIsLoading(true);
+      setFetchError("");
+
+      try {
+         let query = `?date_range=${encodeURIComponent(dateRange)}`;
+         if (dateRange === "Custom") {
+            query += `&start_date=${encodeURIComponent(customStartDate)}`;
+            query += `&end_date=${encodeURIComponent(customEndDate)}`;
+         }
+
+         const response = await axios.get(`/api/reports${query}`);
+         const data = response.data?.data;
+
+         setSales(data?.sales ?? []);
+         setSummary(
+            data?.summary ?? {
+               total_sales: 0,
+               total_cost: 0,
+               total_profit: 0,
+            },
+         );
+      } catch (error) {
+         console.error("Error fetching report data:", error);
+         setSales([]);
+         setSummary({ total_sales: 0, total_cost: 0, total_profit: 0 });
+         setFetchError("Unable to load report data. Please try again.");
+      } finally {
+         setIsLoading(false);
+      }
+   };
+
+   const handleDateRangeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const nextRange = e.target.value;
+      setDateRange(nextRange);
+
+      if (nextRange !== "Custom") {
+         setCustomStartDate("");
+         setCustomEndDate("");
+      }
+   };
+
+   useEffect(() => {
+      fetchReports();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, []);
 
-   const [dateRange, setDateRange] = useState<string>("Today");
-
-   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setDateRange(e.target.value);
-   };
+   const isApplyDisabled =
+      dateRange === "Custom" && (!customStartDate || !customEndDate);
 
    return (
       <>
@@ -28,9 +96,8 @@ const Reports = () => {
                <select
                   data-theme="mintlify"
                   className="select mt-2"
-                  id="favorite-simpson"
                   value={dateRange}
-                  onChange={handleChange}
+                  onChange={handleDateRangeChange}
                >
                   <option value="Today">Today</option>
                   <option value="This week">This week</option>
@@ -47,10 +114,9 @@ const Reports = () => {
                      <input
                         data-theme="mintlify"
                         type="date"
-                        className={`input input-bordered w-full mt-2`}
-                        value={""}
-                        disabled={false}
-                        onChange={() => {}}
+                        className="input input-bordered w-full mt-2"
+                        value={customStartDate}
+                        onChange={(e) => setCustomStartDate(e.target.value)}
                      />
                   </div>
                   <div className="w-[25%]">
@@ -60,59 +126,62 @@ const Reports = () => {
                      <input
                         data-theme="mintlify"
                         type="date"
-                        className={`input input-bordered w-full mt-2`}
-                        value={""}
-                        disabled={false}
-                        onChange={() => {}}
+                        className="input input-bordered w-full mt-2"
+                        value={customEndDate}
+                        onChange={(e) => setCustomEndDate(e.target.value)}
                      />
                   </div>
                </>
             )}
-            <div className={`w-[10%]`}>
+            <div className="w-[10%]">
                <button
                   data-theme="mintlify"
                   className="btn btn-primary mt-9 w-full"
-                  onClick={() => alert("Ready!")}
-                  disabled={false}
+                  onClick={fetchReports}
+                  disabled={isApplyDisabled || isLoading}
                >
-                  Apply
+                  {isLoading ? "Loading..." : "Apply"}
                </button>
             </div>
          </div>
 
+         {fetchError && (
+            <div className="alert alert-error mt-4">
+               <span>{fetchError}</span>
+            </div>
+         )}
+
          <h5 className="font-semibold mt-5">Summary</h5>
          <div className="flex gap-4 mt-2">
             <div className="w-[33%]">
-               {/* Single card */}
                <StatusCard
                   label="Sales"
-                  value="₱ 11,548"
+                  value={formatCurrency(summary.total_sales)}
                   icon="icon-[tabler--currency-dollar]"
                   colorClasses="text-warning bg-warning/20"
                   tooltip="Total sales for the selected date range"
                />
             </div>
             <div className="w-[33%]">
-               {/* Single card */}
                <StatusCard
                   label="Cost"
-                  value="₱ 11,548"
+                  value={formatCurrency(summary.total_cost)}
                   icon="icon-[tabler--wallet]"
                   colorClasses="text-accent bg-accent/20"
                   tooltip="Total cost of goods sold within the selected date range."
                />
             </div>
             <div className="w-[33%]">
-               {/* Single card */}
                <StatusCard
                   label="Profit"
-                  value="₱ 11,548"
+                  value={formatCurrency(summary.total_profit)}
                   icon="icon-[tabler--chart-bar]"
                   colorClasses="text-success bg-success/20"
                   tooltip="Total profit for the selected date range"
                />
             </div>
          </div>
+
          <div className="mt-5">
             <h5 className="font-semibold mb-1">Sales Record</h5>
             <div className="card w-full mt-2">
@@ -129,24 +198,41 @@ const Reports = () => {
                         </tr>
                      </thead>
                      <tbody>
-                        <tr>
-                           <td>2024-06-01</td>
-                           <td>Cash</td>
-                           <td>₱ 1,000</td>
-                           <td>₱ 1,000</td>
-                           <td>₱ 0</td>
-                           <td className="text-right space-x-1">
-                              <button
-                                 className="btn btn-circle btn-text btn-sm"
-                                 aria-label="Add stocks"
-                                 // aria-controls="product-modal"
-                                 // data-overlay="#product-modal"
-                                 onClick={() => alert("Ready to add stocks")}
-                              >
-                                 <span className="icon-[tabler--list-details] size-5"></span>
-                              </button>
-                           </td>
-                        </tr>
+                        {sales.length === 0 ? (
+                           <tr>
+                              <td colSpan={6} className="text-center py-8">
+                                 {isLoading
+                                    ? "Loading sales records..."
+                                    : "No sales records found for the selected date range."}
+                              </td>
+                           </tr>
+                        ) : (
+                           sales.map((record) => (
+                              <tr key={record.id}>
+                                 <td>{formatDate(record.created_at)}</td>
+                                 <td>
+                                    {record.payment_method
+                                       .charAt(0)
+                                       .toUpperCase() +
+                                       record.payment_method.slice(1)}
+                                 </td>
+                                 <td>{formatCurrency(record.total_amount)}</td>
+                                 <td>
+                                    {formatCurrency(record.payment_amount)}
+                                 </td>
+                                 <td>{formatCurrency(record.change_amount)}</td>
+                                 <td className="text-right space-x-1">
+                                    <button
+                                       className="btn btn-circle btn-text btn-sm"
+                                       aria-label="View sale details"
+                                       onClick={() => {}}
+                                    >
+                                       <span className="icon-[tabler--list-details] size-5"></span>
+                                    </button>
+                                 </td>
+                              </tr>
+                           ))
+                        )}
                      </tbody>
                   </table>
                </div>

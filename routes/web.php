@@ -50,6 +50,7 @@ Route::get('/dashboard', [DashboardController::class, 'loadPage'])->name('dashbo
 Route::get('/products', [ProductController::class, 'loadPage'])->name('products.page.load');
 Route::get('/pos', [POSController::class, 'loadPage'])->name('pos.page.load');
 Route::get('/reports', [ReportController::class, 'loadPage'])->name('reports.page.load');
+Route::get('/api/reports', [ReportController::class, 'records'])->name('reports.api.records');
 
 // API Routes
 Route::post('/api/register', [RegistrationController::class, 'register'])->name('registration');
