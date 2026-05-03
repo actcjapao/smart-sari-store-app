@@ -43,8 +43,10 @@ class ReportController extends Controller
             ]);
         }
 
+        // Base query for sales in the given store
         $salesQuery = Sale::where('store_id', $storeId);
 
+        // Apply date filter based on the selected date range (Today, This week, This month, Custom)
         $applyDateFilter = function ($query,  $column = 'created_at') use ($dateRange, $customStartDate, $customEndDate) {
             $now = Carbon::now();
 
@@ -74,8 +76,10 @@ class ReportController extends Controller
             }
         };
 
+        // Apply the date filter to the sales base query
         $salesQuery = $applyDateFilter($salesQuery, 'created_at');
 
+        // Query1: Fetch the sales records with pagination (to improve)
         $sales = $salesQuery
             ->select([
                 'id',
@@ -89,13 +93,16 @@ class ReportController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
+        // Query2: Calculate total sales amount for the filtered records
         $totalSales = $salesQuery->sum('total_amount');
 
+        // Calculate total cost for the filtered sales records
         $totalCost = DB::table('sale_items')
             ->join('sales', 'sale_items.sale_id', '=', 'sales.id')
             ->join('products', 'sale_items.product_id', '=', 'products.id')
             ->where('sales.store_id', $storeId);
 
+        // Query3: Apply the same date filter and run the total cost calculation query        
         $totalCost = $applyDateFilter($totalCost, 'sales.created_at')
             ->selectRaw('COALESCE(SUM(products.cost_price * sale_items.quantity), 0) as total_cost')
             ->value('total_cost');
