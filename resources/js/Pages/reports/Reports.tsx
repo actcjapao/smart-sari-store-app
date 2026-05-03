@@ -17,6 +17,15 @@ const Reports = () => {
    const [isLoading, setIsLoading] = useState<boolean>(false);
    const [fetchError, setFetchError] = useState<string>("");
 
+   // Reinitialize FlyonUI when component mounts
+   // Without this, the modal won't work when navigating to this page via Inertia links
+   useEffect(() => {
+      // Access the global FlyonUI/HSStaticMethods
+      if (window.HSStaticMethods) {
+         window.HSStaticMethods.autoInit();
+      }
+   }, []);
+
    const formatCurrency = (value: number) =>
       `₱ ${value.toLocaleString(undefined, {
          minimumFractionDigits: 2,
