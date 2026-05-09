@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Sale;
 use App\Models\User;
+use App\Models\SaleItem;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
@@ -133,6 +135,46 @@ class ReportController extends Controller
                     'total_profit' => (float) ($totalSales - $totalCost),
                 ],
             ],
+        ]);
+    }
+
+    public function getSaleItems(Request $request, string $saleUuid)
+    {
+        $authenticatedUser = session('authenticated_user');
+
+        if (!$authenticatedUser) {
+            abort(403, 'Unauthorized');
+        }
+
+        $items = SaleItem::query()
+            ->select([
+                'sale_items.id',
+                'sale_items.product_id',
+                'sale_items.quantity',
+                'sale_items.unit_price',
+                'sale_items.total_price',
+            ])
+            ->with([
+                'product:id,name,brand,selling_price'
+            ])
+            ->whereHas('sale', function ($query) use ($saleUuid) {
+                $query->where('uuid', $saleUuid);
+            })
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'name' => $item->product?->name,
+                    'brand' => $item->product?->brand,
+                    'selling_price' => $item->product?->selling_price,
+
+                    'quantity' => $item->quantity,
+                    'unit_price' => $item->unit_price,
+                    'total_price' => $item->total_price,
+                ];
+            });
+
+        return response()->json([
+            'data' => $items,
         ]);
     }
 }

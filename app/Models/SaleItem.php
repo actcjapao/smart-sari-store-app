@@ -56,4 +56,12 @@ class SaleItem extends Model
     {
         return $this->belongsTo(Sale::class);
     }
+
+    /**
+     * Get the product of this sale item.
+     */
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

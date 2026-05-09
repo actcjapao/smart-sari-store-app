@@ -143,9 +143,33 @@ const Reports = () => {
       );
    }
 
-   const handleSaleRowClick = (sale: Sale) => {
+   const viewSaleTransactionClickHandler = async (sale: Sale) => {
       setSelectedSale(sale);
       saleDetailsModalOpenRef.current?.click();
+
+      try {
+         const response = await axios.get(
+            `/api/reports/sales-items/${sale.uuid}`,
+         );
+         const data = response.data?.data;
+         console.log("data", data);
+
+         // setPaginatedSales(data);
+         // setSummary(
+         //    data?.summary ?? {
+         //       total_sales: 0,
+         //       total_cost: 0,
+         //       total_profit: 0,
+         //    },
+         // );
+      } catch (error) {
+         // console.error("Error fetching report data:", error);
+         // setPaginatedSales(null);
+         // setSummary({ total_sales: 0, total_cost: 0, total_profit: 0 });
+         // setFetchError("Unable to load report data. Please try again.");
+      } finally {
+         // setIsLoading(false);
+      }
    };
 
    return (
@@ -305,7 +329,9 @@ const Reports = () => {
                                        className="btn btn-circle btn-text btn-sm"
                                        aria-label="View sale details"
                                        onClick={() =>
-                                          handleSaleRowClick(record)
+                                          viewSaleTransactionClickHandler(
+                                             record,
+                                          )
                                        }
                                     >
                                        <span className="icon-[tabler--list-details] size-5"></span>

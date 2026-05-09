@@ -50,7 +50,6 @@ Route::get('/dashboard', [DashboardController::class, 'loadPage'])->name('dashbo
 Route::get('/products', [ProductController::class, 'loadPage'])->name('products.page.load');
 Route::get('/pos', [POSController::class, 'loadPage'])->name('pos.page.load');
 Route::get('/reports', [ReportController::class, 'loadPage'])->name('reports.page.load');
-Route::get('/api/reports', [ReportController::class, 'records'])->name('reports.api.records');
 
 // API Routes
 Route::post('/api/register', [RegistrationController::class, 'register'])->name('registration');
@@ -60,3 +59,5 @@ Route::post('/api/product/save/{product_uuid?}', [ProductController::class, 'sav
 Route::get('/api/product/search', [POSController::class, 'searchProducts'])->name('product.search');
 Route::post('/api/sale', [POSController::class, 'processSale'])->name('sale.process');
 Route::post('/api/debt', [POSController::class, 'processDebt'])->name('debt.process');
+Route::get('/api/reports', [ReportController::class, 'records'])->name('reports.api.records');
+Route::get('/api/reports/sales-items/{sale_uuid}', [ReportController::class, 'getSaleItems'])->name('sale.items.get');

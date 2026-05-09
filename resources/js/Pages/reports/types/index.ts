@@ -1,7 +1,6 @@
 import { Paginator } from "@/types/Paginator.type";
 
 export type Sale = {
-   id: number;
    uuid: string;
    created_at: string;
    payment_method: string;
