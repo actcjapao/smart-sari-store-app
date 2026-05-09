@@ -304,9 +304,9 @@ const Reports = () => {
                                     <button
                                        className="btn btn-circle btn-text btn-sm"
                                        aria-label="View sale details"
-                                       onClick={(
-                                          event: React.MouseEvent<HTMLButtonElement>,
-                                       ) => handleSaleRowClick(record, event)}
+                                       onClick={() =>
+                                          handleSaleRowClick(record)
+                                       }
                                     >
                                        <span className="icon-[tabler--list-details] size-5"></span>
                                     </button>
