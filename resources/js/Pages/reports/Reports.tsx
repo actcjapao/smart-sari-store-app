@@ -3,6 +3,7 @@ import axios from "axios";
 import React, { useEffect, useState, useRef } from "react";
 import StatusCard from "./StatusCard";
 import { PaginatedSale, Sale, SaleItem, Summary } from "./types";
+import SkeletonRow from "@/components/skeleton/SkeletonRowCell";
 
 const Reports = () => {
    const [dateRange, setDateRange] = useState<string>("Today");
@@ -116,62 +117,6 @@ const Reports = () => {
       // if navigationUrl is null, the url will fallback to the default value
       fetchReports(queryParams, navigationUrl || undefined);
    };
-
-   function SaleItemsSkeletonRow() {
-      return (
-         <tr>
-            <td className="py-3">
-               <div className="skeleton h-4 w-25"></div>
-            </td>
-
-            <td className="py-3">
-               <div className="skeleton h-4 w-25"></div>
-            </td>
-
-            <td className="py-3">
-               <div className="skeleton h-4 w-15"></div>
-            </td>
-
-            <td className="py-3">
-               <div className="skeleton h-4 w-15"></div>
-            </td>
-
-            <td className="py-3">
-               <div className="skeleton h-4 w-15"></div>
-            </td>
-         </tr>
-      );
-   }
-
-   function SalesSkeletonRow() {
-      return (
-         <tr>
-            <td className="py-3">
-               <div className="skeleton h-4 w-25"></div>
-            </td>
-
-            <td className="py-3">
-               <div className="skeleton h-4 w-20"></div>
-            </td>
-
-            <td className="py-3">
-               <div className="skeleton h-4 w-15"></div>
-            </td>
-
-            <td className="py-3">
-               <div className="skeleton h-4 w-15"></div>
-            </td>
-
-            <td className="py-3">
-               <div className="skeleton h-4 w-15"></div>
-            </td>
-
-            <td className="py-3 text-right">
-               <div className="skeleton h-8 w-8 rounded-full ml-auto"></div>
-            </td>
-         </tr>
-      );
-   }
 
    const viewSaleTransactionClickHandler = async (sale: Sale) => {
       setIsSaleDetailsLoading(true);
@@ -318,7 +263,22 @@ const Reports = () => {
                            <>
                               {isLoading ? (
                                  Array.from({ length: 5 }).map((_, i) => (
-                                    <SalesSkeletonRow key={i} />
+                                    <SkeletonRow
+                                       key={i}
+                                       cells={[
+                                          { width: "w-25" },
+                                          { width: "w-20" },
+                                          { width: "w-15" },
+                                          { width: "w-15" },
+                                          { width: "w-15" },
+                                          {
+                                             width: "w-8",
+                                             cellClassName: "text-right",
+                                             skeletonClassName:
+                                                "rounded-full ml-auto h-8",
+                                          },
+                                       ]}
+                                    />
                                  ))
                               ) : (
                                  <tr>
@@ -573,8 +533,25 @@ const Reports = () => {
                                                    Array.from({
                                                       length: 5,
                                                    }).map((_, i) => (
-                                                      <SaleItemsSkeletonRow
+                                                      <SkeletonRow
                                                          key={i}
+                                                         cells={[
+                                                            {
+                                                               width: "w-25",
+                                                            },
+                                                            {
+                                                               width: "w-25",
+                                                            },
+                                                            {
+                                                               width: "w-15",
+                                                            },
+                                                            {
+                                                               width: "w-15",
+                                                            },
+                                                            {
+                                                               width: "w-15",
+                                                            },
+                                                         ]}
                                                       />
                                                    ))
                                                 ) : (
