@@ -2,7 +2,7 @@ import MainPanelLayout from "@/components/MainPanelLayout";
 import axios from "axios";
 import React, { useEffect, useState, useRef } from "react";
 import StatusCard from "./StatusCard";
-import { PaginatedSale, Sale, Summary } from "./types";
+import { PaginatedSale, Sale, SaleItem, Summary } from "./types";
 
 const Reports = () => {
    const [dateRange, setDateRange] = useState<string>("Today");
@@ -21,6 +21,10 @@ const Reports = () => {
    const [queryParams, setQueryParams] = useState<string>("");
    const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
    const saleDetailsModalOpenRef = useRef<HTMLButtonElement | null>(null);
+
+   const [isSaleDetailsLoading, setIsSaleDetailsLoading] =
+      useState<boolean>(false);
+   const [saleItems, setSaleItems] = useState<SaleItem[]>([]);
 
    // Reinitialize FlyonUI when component mounts
    // Without this, the modal won't work when navigating to this page via Inertia links
@@ -113,6 +117,32 @@ const Reports = () => {
       fetchReports(queryParams, navigationUrl || undefined);
    };
 
+   function SaleItemsSkeletonRow() {
+      return (
+         <tr>
+            <td className="py-3">
+               <div className="skeleton h-4 w-25"></div>
+            </td>
+
+            <td className="py-3">
+               <div className="skeleton h-4 w-25"></div>
+            </td>
+
+            <td className="py-3">
+               <div className="skeleton h-4 w-15"></div>
+            </td>
+
+            <td className="py-3">
+               <div className="skeleton h-4 w-15"></div>
+            </td>
+
+            <td className="py-3">
+               <div className="skeleton h-4 w-15"></div>
+            </td>
+         </tr>
+      );
+   }
+
    function SalesSkeletonRow() {
       return (
          <tr>
@@ -144,6 +174,14 @@ const Reports = () => {
    }
 
    const viewSaleTransactionClickHandler = async (sale: Sale) => {
+      setIsSaleDetailsLoading(true);
+      if (sale.uuid === selectedSale?.uuid) {
+         // If the same sale is clicked again, just reopen the modal without refetching
+         saleDetailsModalOpenRef.current?.click();
+         setIsSaleDetailsLoading(false);
+         return;
+      }
+
       setSelectedSale(sale);
       saleDetailsModalOpenRef.current?.click();
 
@@ -152,23 +190,11 @@ const Reports = () => {
             `/api/reports/sales-items/${sale.uuid}`,
          );
          const data = response.data?.data;
-         console.log("data", data);
-
-         // setPaginatedSales(data);
-         // setSummary(
-         //    data?.summary ?? {
-         //       total_sales: 0,
-         //       total_cost: 0,
-         //       total_profit: 0,
-         //    },
-         // );
+         setSaleItems(data);
       } catch (error) {
-         // console.error("Error fetching report data:", error);
-         // setPaginatedSales(null);
-         // setSummary({ total_sales: 0, total_cost: 0, total_profit: 0 });
-         // setFetchError("Unable to load report data. Please try again.");
+         console.error("Error fetching sale items", error);
       } finally {
-         // setIsLoading(false);
+         setIsSaleDetailsLoading(false);
       }
    };
 
@@ -276,7 +302,7 @@ const Reports = () => {
             <div className="card w-full mt-2">
                <div className="overflow-x-auto">
                   <table className="table table-sm">
-                     <thead>
+                     <thead className="bg-gray-100">
                         <tr>
                            <th>Date</th>
                            <th>Method</th>
@@ -521,7 +547,7 @@ const Reports = () => {
                               <div className="card w-full mt-2">
                                  <div className="overflow-x-auto">
                                     <table className="table table-sm">
-                                       <thead>
+                                       <thead className="bg-gray-100">
                                           <tr>
                                              <th>Name</th>
                                              <th>Brand</th>
@@ -541,15 +567,63 @@ const Reports = () => {
                                        </thead>
 
                                        <tbody>
-                                          <tr>
-                                             <td
-                                                colSpan={6}
-                                                className="text-center py-8 text-gray-500"
-                                             >
-                                                No sales records found for the
-                                                selected date range.
-                                             </td>
-                                          </tr>
+                                          {saleItems.length === 0 ? (
+                                             <>
+                                                {isSaleDetailsLoading ? (
+                                                   Array.from({
+                                                      length: 5,
+                                                   }).map((_, i) => (
+                                                      <SaleItemsSkeletonRow
+                                                         key={i}
+                                                      />
+                                                   ))
+                                                ) : (
+                                                   <tr>
+                                                      <td
+                                                         colSpan={6}
+                                                         className="text-center py-8 text-gray-500"
+                                                      >
+                                                         No items found for the
+                                                         selected transaction
+                                                      </td>
+                                                   </tr>
+                                                )}
+                                             </>
+                                          ) : (
+                                             saleItems.map(
+                                                (saleItem: SaleItem) => {
+                                                   return (
+                                                      <tr key={saleItem.name}>
+                                                         <td>
+                                                            {saleItem.name}
+                                                         </td>
+                                                         <td>
+                                                            {saleItem.brand ??
+                                                               "-"}
+                                                         </td>
+                                                         <td className="text-right">
+                                                            {formatCurrency(
+                                                               saleItem.selling_price,
+                                                            )}
+                                                         </td>
+                                                         <td className="text-center">
+                                                            {saleItem.quantity}
+                                                         </td>
+                                                         <td className="text-right">
+                                                            {formatCurrency(
+                                                               saleItem.unit_price,
+                                                            )}
+                                                         </td>
+                                                         <td className="text-right">
+                                                            {formatCurrency(
+                                                               saleItem.total_price,
+                                                            )}
+                                                         </td>
+                                                      </tr>
+                                                   );
+                                                },
+                                             )
+                                          )}
                                        </tbody>
                                     </table>
                                  </div>

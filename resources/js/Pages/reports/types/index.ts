@@ -18,3 +18,12 @@ export type Summary = {
 export type PaginatedSale = {
    sales: Paginator<Sale>;
 };
+
+export type SaleItem = {
+   brand: string;
+   name: string;
+   quantity: number;
+   selling_price: number;
+   unit_price: number;
+   total_price: number;
+};
