@@ -39,7 +39,6 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
    >(ITEM_TYPES.PER_ITEM);
    const [wholeItemCostPrice, setWholeItemCostPrice] = useState<string>("");
    const [pieces, setPieces] = useState<string>("");
-   const [calculatedProfit, setCalculatedProfit] = useState<string>("");
 
    // Reinitialize FlyonUI when component mounts
    // Without this, the modal won't work when navigating to this page via Inertia links
@@ -230,20 +229,12 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
       HTMLInputElement
    > = () => {
       normalizeToTwoDecimals(wholeItemCostPrice, setWholeItemCostPrice);
-
-      if (pieces !== "") {
-         calculatePerItemCostPrice();
-      }
    };
 
    const piecesOnBlurHandler: React.FocusEventHandler<
       HTMLInputElement
    > = () => {
       normalizeToTwoDecimals(pieces, setPieces);
-
-      if (wholeItemCostPrice !== "") {
-         calculatePerItemCostPrice();
-      }
    };
 
    const sellingPriceOnBlurHandler: React.FocusEventHandler<
@@ -252,35 +243,28 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
       if (data.selling_price === "") return;
       const normalized = Number(data.selling_price).toFixed(2);
       setData("selling_price", normalized);
-
-      calculatePerItemCostPrice();
    };
 
-   /**
-    * Calculates:
-    * - cost price per item
-    * - profit based on selling price
-    */
-   const calculatePerItemCostPrice = () => {
-      const wholeCost = Number(wholeItemCostPrice);
-      const piecesCount = Number(pieces);
+   // On each re-render, these blocks runs. From here
+   const wholeCost = Number(wholeItemCostPrice);
+   const piecesCount = Number(pieces);
 
-      if (!wholeCost || !piecesCount) {
-         setData("cost_price", "");
-         setCalculatedProfit("0.00");
-         return;
+   const perItemCost =
+      wholeCost > 0 && piecesCount > 0 ? wholeCost / piecesCount : 0;
+   const normalizedPerItemCost = perItemCost > 0 ? perItemCost.toFixed(2) : "";
+
+   const sellingPrice = Number(data.selling_price || 0);
+   const calculatedProfit =
+      sellingPrice > 0 && perItemCost > 0
+         ? Math.max(sellingPrice - perItemCost, 0).toFixed(2)
+         : "0.00";
+   // To here
+
+   useEffect(() => {
+      if (data.cost_price !== normalizedPerItemCost) {
+         setData("cost_price", normalizedPerItemCost);
       }
-
-      const perItemCost = wholeCost / piecesCount;
-      const normalizedPerItemCost = perItemCost.toFixed(2);
-
-      const sellingPrice = Number(data.selling_price || 0);
-      const profit = sellingPrice - perItemCost;
-      const normalizedProfit = profit > 0 ? profit.toFixed(2) : "0.00";
-
-      setData("cost_price", normalizedPerItemCost);
-      setCalculatedProfit(normalizedProfit);
-   };
+   }, [normalizedPerItemCost, setData, data.cost_price]);
 
    return (
       <>
