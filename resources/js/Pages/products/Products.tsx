@@ -263,8 +263,9 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
    useEffect(() => {
       if (data.cost_price !== normalizedPerItemCost) {
          setData("cost_price", normalizedPerItemCost);
+         setData("stock_quantity", piecesCount.toString());
       }
-   }, [normalizedPerItemCost, setData, data.cost_price]);
+   }, [normalizedPerItemCost, setData, data.cost_price, piecesCount]);
 
    return (
       <>
@@ -707,52 +708,6 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
                                     )}
                                  </div>
                               </div>
-                              {/* Tags Field */}
-                              <div className="w-full space-y-2 mt-4">
-                                 <label className="label-text" htmlFor="tags">
-                                    <span className="font-medium">Tags</span>
-                                    <span> (optional)</span>
-                                 </label>
-
-                                 {/* Input */}
-                                 <input
-                                    id="tags"
-                                    type="text"
-                                    data-theme="mintlify"
-                                    className="input input-bordered w-full"
-                                    placeholder="Type tag and press Enter"
-                                    value={tagInput}
-                                    onChange={(e) =>
-                                       setTagInput(e.target.value)
-                                    }
-                                    onKeyDown={handleTagKeyDown}
-                                 />
-
-                                 {/* Pills */}
-                                 <div className="flex flex-wrap gap-2 mb-2">
-                                    {data.tags.map((tag: string) => (
-                                       <span
-                                          key={tag}
-                                          className="badge badge-primary badge-soft flex items-center gap-1 px-3 py-2"
-                                       >
-                                          {tag}
-                                          <button
-                                             type="button"
-                                             onClick={() => removeTag(tag)}
-                                             className="ml-1"
-                                          >
-                                             <span className="icon-[tabler--x] size-3"></span>
-                                          </button>
-                                       </span>
-                                    ))}
-                                 </div>
-
-                                 {errors.tags && (
-                                    <p className="text-sm text-red-500 mt-1">
-                                       {errors.tags}
-                                    </p>
-                                 )}
-                              </div>
                            </>
                         ) : (
                            <>
@@ -854,6 +809,50 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
                               </div>
                            </>
                         )}
+                        {/* Tags Field */}
+                        <div className="w-full space-y-2 mt-4">
+                           <label className="label-text" htmlFor="tags">
+                              <span className="font-medium">Tags</span>
+                              <span> (optional)</span>
+                           </label>
+
+                           {/* Input */}
+                           <input
+                              id="tags"
+                              type="text"
+                              data-theme="mintlify"
+                              className="input input-bordered w-full"
+                              placeholder="Type tag and press Enter"
+                              value={tagInput}
+                              onChange={(e) => setTagInput(e.target.value)}
+                              onKeyDown={handleTagKeyDown}
+                           />
+
+                           {/* Pills */}
+                           <div className="flex flex-wrap gap-2 mb-2">
+                              {data.tags.map((tag: string) => (
+                                 <span
+                                    key={tag}
+                                    className="badge badge-primary badge-soft flex items-center gap-1 px-3 py-2"
+                                 >
+                                    {tag}
+                                    <button
+                                       type="button"
+                                       onClick={() => removeTag(tag)}
+                                       className="ml-1"
+                                    >
+                                       <span className="icon-[tabler--x] size-3"></span>
+                                    </button>
+                                 </span>
+                              ))}
+                           </div>
+
+                           {errors.tags && (
+                              <p className="text-sm text-red-500 mt-1">
+                                 {errors.tags}
+                              </p>
+                           )}
+                        </div>
                      </form>
                   </div>
 
