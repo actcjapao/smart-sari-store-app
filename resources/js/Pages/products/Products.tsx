@@ -261,11 +261,14 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
    // To here
 
    useEffect(() => {
-      if (data.cost_price !== normalizedPerItemCost) {
+      if (
+         data.cost_price !== normalizedPerItemCost &&
+         ITEM_TYPES.WHOLE_ITEM === itemType
+      ) {
          setData("cost_price", normalizedPerItemCost);
          setData("stock_quantity", piecesCount.toString());
       }
-   }, [normalizedPerItemCost, setData, data.cost_price, piecesCount]);
+   }, [normalizedPerItemCost, setData, data.cost_price, piecesCount, itemType]);
 
    return (
       <>
@@ -765,6 +768,9 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
                                        type="text"
                                        className={`input w-full ${hasError("cost_price") ? "is-invalid" : ""}`}
                                        value={data.cost_price}
+                                       onChange={() => {
+                                          // just to prevent react warning about controlled input.
+                                       }}
                                     />
                                  </div>
                                  <div className="space-y-2">
@@ -804,6 +810,9 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
                                        type="text"
                                        className={`input w-full ${hasError("selling_price") ? "is-invalid" : ""}`}
                                        value={calculatedProfit}
+                                       onChange={() => {
+                                          // just to prevent react warning about controlled input.
+                                       }}
                                     />
                                  </div>
                               </div>
