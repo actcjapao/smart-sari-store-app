@@ -40,6 +40,9 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
    const [wholeItemCostPrice, setWholeItemCostPrice] = useState<string>("");
    const [pieces, setPieces] = useState<string>("");
 
+   const [selectedProductForAddStock, setSelectedProductForAddStock] =
+      useState<Product | null>(null);
+
    // Reinitialize FlyonUI when component mounts
    // Without this, the modal won't work when navigating to this page via Inertia links
    useEffect(() => {
@@ -270,6 +273,23 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
          : "0.00";
    // To here
 
+   const renderStatusMeta = (stock_quantity: number) => {
+      return stock_quantity > 15
+         ? {
+              label: "Available",
+              style: "badge-soft badge-success",
+           }
+         : stock_quantity > 0
+           ? {
+                label: "Low stock",
+                style: "badge-soft badge-warning",
+             }
+           : {
+                label: "Out of stock",
+                style: "badge-soft badge-error",
+             };
+   };
+
    useEffect(() => {
       if (
          data.cost_price !== normalizedPerItemCost &&
@@ -279,6 +299,13 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
          setData("stock_quantity", piecesCount.toString());
       }
    }, [normalizedPerItemCost, setData, data.cost_price, piecesCount, itemType]);
+
+   // ============================ Add Stock Blocks ============================
+   const openAddStockModal = (product: Product) => {
+      setSelectedProductForAddStock(product);
+   };
+
+   // ============================ Add Stock Blocks ============================
 
    return (
       <>
@@ -322,21 +349,7 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
                                  const stockValue = Number(
                                     product.stock_quantity,
                                  );
-                                 const status =
-                                    stockValue > 15
-                                       ? {
-                                            label: "Available",
-                                            style: "badge-soft badge-success",
-                                         }
-                                       : stockValue > 0
-                                         ? {
-                                              label: "Low stock",
-                                              style: "badge-soft badge-warning",
-                                           }
-                                         : {
-                                              label: "Out of stock",
-                                              style: "badge-soft badge-error",
-                                           };
+                                 const status = renderStatusMeta(stockValue);
 
                                  return (
                                     <tr key={product.uuid}>
@@ -373,10 +386,10 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
                                           <button
                                              className="btn btn-circle btn-text btn-sm"
                                              aria-label="Add stocks"
-                                             // aria-controls="product-modal"
-                                             // data-overlay="#product-modal"
+                                             aria-controls="stock-modal"
+                                             data-overlay="#stock-modal"
                                              onClick={() =>
-                                                alert("Ready to add stocks")
+                                                openAddStockModal(product)
                                              }
                                           >
                                              <span className="icon-[tabler--cube-plus] size-5"></span>
@@ -901,6 +914,241 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
                      >
                         {mode === "add" ? "Add" : "Update"}
                      </button>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+         {/* Product Stock Modal */}
+         <div
+            id="stock-modal"
+            className="overlay modal overlay-open:opacity-100 overlay-open:duration-300 modal-middle hidden"
+            role="dialog"
+            tabIndex={-1}
+         >
+            <div className="modal-dialog modal-lg">
+               <div className="modal-content border border-base-300 bg-base-100 shadow-2xl">
+                  {/* Header */}
+                  <div className="modal-header border-b border-base-200 px-6 pt-5 pb-4">
+                     <div className="flex items-start gap-4">
+                        {/* Product Avatar */}
+                        <div
+                           data-theme="mintlify"
+                           className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary"
+                        >
+                           <span className="icon-[tabler--package] size-7"></span>
+                        </div>
+
+                        {/* Product Identity */}
+                        <div className="flex-1">
+                           <div className="flex flex-wrap items-center gap-2">
+                              <h3 className="modal-title text-xl font-semibold text-base-content">
+                                 {selectedProductForAddStock?.name}
+                              </h3>
+
+                              <span
+                                 className={`badge badge-sm ${
+                                    renderStatusMeta(
+                                       selectedProductForAddStock?.stock_quantity ||
+                                          0,
+                                    ).style
+                                 }`}
+                              >
+                                 {
+                                    renderStatusMeta(
+                                       selectedProductForAddStock?.stock_quantity ||
+                                          0,
+                                    ).label
+                                 }
+                              </span>
+                           </div>
+                        </div>
+                     </div>
+
+                     {/* Close */}
+                     <button
+                        type="button"
+                        className="btn btn-text btn-circle btn-sm absolute end-4 top-4"
+                        aria-label="Close"
+                        data-overlay="#stock-modal"
+                     >
+                        <span className="icon-[tabler--x] size-5"></span>
+                     </button>
+                  </div>
+
+                  {/* Body */}
+                  <div className="modal-body space-y-6 px-6 py-6">
+                     {/* Product Details */}
+                     <section className="rounded-2xl border border-base-200 bg-base-50 p-4">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                           {/* Brand */}
+                           <div>
+                              <p className="text-xs uppercase tracking-wide text-base-content/50">
+                                 Brand
+                              </p>
+
+                              <p className="mt-1 text-sm font-medium text-base-content">
+                                 {selectedProductForAddStock?.brand ||
+                                    "No brand assigned"}
+                              </p>
+                           </div>
+
+                           {/* Tags */}
+                           <div>
+                              <p className="text-xs uppercase tracking-wide text-base-content/50">
+                                 Tags
+                              </p>
+
+                              <div className="mt-2 flex flex-wrap gap-1.5">
+                                 {selectedProductForAddStock?.tags?.length ? (
+                                    selectedProductForAddStock?.tags?.map(
+                                       (tag, index) => (
+                                          <span
+                                             key={index}
+                                             className="badge badge-soft badge-neutral badge-sm"
+                                          >
+                                             #{tag}
+                                          </span>
+                                       ),
+                                    )
+                                 ) : (
+                                    <span className="text-sm text-base-content/50">
+                                       No tags
+                                    </span>
+                                 )}
+                              </div>
+                           </div>
+                        </div>
+
+                        {/* Description */}
+                        <div className="mt-4 border-t border-base-200 pt-4">
+                           <p className="text-xs uppercase tracking-wide text-base-content/50">
+                              Description
+                           </p>
+
+                           <p className="mt-1 line-clamp-3 text-sm leading-relaxed text-base-content/80">
+                              {selectedProductForAddStock?.description ||
+                                 "No product description available."}
+                           </p>
+                        </div>
+                     </section>
+
+                     {/* Inventory Overview */}
+                     <section>
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                           {/* Cost Price */}
+                           <div className="rounded-2xl border border-base-200 bg-base-50 p-4">
+                              <div className="flex items-center gap-3">
+                                 <div className="rounded-xl bg-info/10 p-2.5 text-info">
+                                    <span className="icon-[tabler--cash] size-5"></span>
+                                 </div>
+
+                                 <div>
+                                    <p className="text-xs uppercase tracking-wide text-base-content/60">
+                                       Cost Price
+                                    </p>
+
+                                    <h4 className="mt-1 text-lg font-semibold">
+                                       ₱{selectedProductForAddStock?.cost_price}
+                                    </h4>
+                                 </div>
+                              </div>
+                           </div>
+
+                           {/* Selling Price */}
+                           <div className="rounded-2xl border border-base-200 bg-base-50 p-4">
+                              <div className="flex items-center gap-3">
+                                 <div className="rounded-xl bg-success/10 p-2.5 text-success">
+                                    <span className="icon-[tabler--shopping-cart-dollar] size-5"></span>
+                                 </div>
+
+                                 <div>
+                                    <p className="text-xs uppercase tracking-wide text-base-content/60">
+                                       Selling Price
+                                    </p>
+
+                                    <h4 className="mt-1 text-lg font-semibold">
+                                       ₱
+                                       {
+                                          selectedProductForAddStock?.selling_price
+                                       }
+                                    </h4>
+                                 </div>
+                              </div>
+                           </div>
+
+                           {/* Available Stock */}
+                           <div className="rounded-2xl border border-base-200 bg-base-50 p-4">
+                              <div className="flex items-center gap-3">
+                                 <div className="rounded-xl bg-warning/10 p-2.5 text-warning">
+                                    <span className="icon-[tabler--package] size-5"></span>
+                                 </div>
+
+                                 <div>
+                                    <p className="text-xs uppercase tracking-wide text-base-content/60">
+                                       Available Stock
+                                    </p>
+
+                                    <h4 className="mt-1 text-lg font-semibold">
+                                       {
+                                          selectedProductForAddStock?.stock_quantity
+                                       }
+                                    </h4>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </section>
+
+                     {/* Inventory Update */}
+                     <section className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
+                        <div className="mb-3 flex items-start gap-3">
+                           <div>
+                              <h4 className="font-semibold">
+                                 Inventory Update
+                              </h4>
+
+                              <p className="text-sm text-base-content/60">
+                                 Adjust product inventory and maintain stock
+                                 accuracy
+                              </p>
+                           </div>
+                        </div>
+
+                        {/* Adjustment Quantity */}
+                        <div>
+                           <input
+                              data-theme="mintlify"
+                              type="number"
+                              min="1"
+                              placeholder="Enter additional quantity"
+                              className="input input-bordered w-full"
+                           />
+                        </div>
+                     </section>
+                  </div>
+
+                  {/* Footer */}
+                  <div className="modal-footer border-t border-base-200 px-6 py-4">
+                     <div className="flex w-full items-center justify-end gap-3">
+                        <button
+                           type="button"
+                           data-theme="mintlify"
+                           className="btn btn-outline btn-accent"
+                           data-overlay="#stock-modal"
+                        >
+                           Cancel
+                        </button>
+
+                        <button
+                           type="button"
+                           data-theme="mintlify"
+                           className="btn btn-primary px-7"
+                           disabled={processing}
+                        >
+                           Apply Inventory Update
+                        </button>
+                     </div>
                   </div>
                </div>
             </div>
