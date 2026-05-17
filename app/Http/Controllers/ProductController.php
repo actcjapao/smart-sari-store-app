@@ -73,4 +73,16 @@ class ProductController extends Controller
         // Redirect to the products page with a success message (but only reloads the product list in the frontend)
         return back()->with('success', 'Product saved successfully!');
     }
+
+    function updateStock(Request $request, $product_uuid) {
+        $request->validate([
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $product = Product::where('uuid', $product_uuid)->firstOrFail();
+        $product->stock_quantity += $request->input('quantity');
+        $product->save();
+
+        return back()->with('success', 'Stock updated successfully!');
+    }
 }

@@ -57,6 +57,7 @@ Route::post('/api/login', [AuthenticationController::class, 'login'])->name('log
 
 Route::post('/api/product/save/{product_uuid?}', [ProductController::class, 'save'])->name('product.save');
 Route::get('/api/product/search', [POSController::class, 'searchProducts'])->name('product.search');
+Route::put('/api/product/stock/{product_uuid}', [ProductController::class, 'updateStock'])->name('product.stock.update');
 Route::post('/api/sale', [POSController::class, 'processSale'])->name('sale.process');
 Route::post('/api/debt', [POSController::class, 'processDebt'])->name('debt.process');
 Route::get('/api/reports', [ReportController::class, 'records'])->name('reports.api.records');

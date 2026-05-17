@@ -5,6 +5,7 @@ import { Product } from "./types";
 import { PageProps } from "@/types/PageProp.type";
 import { Paginator } from "@/types/Paginator.type";
 import FlashAlert from "@/components/alert/FlashAlert";
+import axios from "axios";
 
 type ProductsPageProps = {
    store_id: number;
@@ -301,10 +302,35 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
    }, [normalizedPerItemCost, setData, data.cost_price, piecesCount, itemType]);
 
    // ============================ Add Stock Blocks ============================
+   const [isUpdatingStock, setIsUpdatingStock] = useState<boolean>(false);
    const openAddStockModal = (product: Product) => {
       setSelectedProductForAddStock(product);
    };
+   const [additionalQuantity, setAdditionalQuantity] = useState<string>("");
 
+   const updateStockHandler = async (product_uuid: string | undefined) => {
+      if (product_uuid === undefined) return;
+
+      const parsedQuantity = parseInt(additionalQuantity);
+      if (parsedQuantity <= 0) return;
+
+      setIsUpdatingStock(true);
+
+      try {
+         const response = await axios.put(
+            `/api/product/stock/${product_uuid}`,
+            {
+               quantity: parsedQuantity,
+            },
+         );
+         const data = response.data?.data;
+         console.log(data);
+      } catch (error) {
+         console.error("Error updating product stock", error);
+      } finally {
+         setIsUpdatingStock(false);
+      }
+   };
    // ============================ Add Stock Blocks ============================
 
    return (
@@ -1123,6 +1149,10 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
                               min="1"
                               placeholder="Enter additional quantity"
                               className="input input-bordered w-full"
+                              value={additionalQuantity}
+                              onChange={(
+                                 e: React.ChangeEvent<HTMLInputElement>,
+                              ) => setAdditionalQuantity(e.target.value)}
                            />
                         </div>
                      </section>
@@ -1144,9 +1174,14 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
                            type="button"
                            data-theme="mintlify"
                            className="btn btn-primary px-7"
-                           disabled={processing}
+                           disabled={isUpdatingStock}
+                           onClick={() =>
+                              updateStockHandler(
+                                 selectedProductForAddStock?.uuid,
+                              )
+                           }
                         >
-                           Apply Inventory Update
+                           {isUpdatingStock ? "Updating..." : "Update Stock"}
                         </button>
                      </div>
                   </div>
