@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, usePage } from "@inertiajs/react";
 
 type MainPanelLayoutProps = {
@@ -28,6 +28,15 @@ const MainPanelLayout = ({ children, title }: MainPanelLayoutProps) => {
          .slice(0, 2)
          .join("");
    })();
+
+   // Reinitialize FlyonUI when component mounts
+   // Without this, the modal or other components that needs Flyui JS won't work when navigating to this page via Inertia links
+   useEffect(() => {
+      // Access the global FlyonUI/HSStaticMethods
+      if (window.HSStaticMethods) {
+         window.HSStaticMethods.autoInit();
+      }
+   }, []);
 
    const navLinkClass = (path: string) =>
       `flex items-center gap-3 px-4 py-2 rounded-lg transition ${
@@ -125,15 +134,41 @@ const MainPanelLayout = ({ children, title }: MainPanelLayoutProps) => {
 
                   <div className="flex items-center gap-4">
                      <span className="text-sm">{user?.name ?? "--"}</span>
-                     <div
-                        data-theme="mintlify"
-                        className="bg-transparent avatar avatar-placeholder"
-                     >
-                        <div className="bg-primary/10 text-primary size-8 rounded-full flex items-center justify-center">
-                           <span className="text-md uppercase pb-0.5">
-                              {initials}
-                           </span>
-                        </div>
+                     <div className="dropdown relative inline-flex">
+                        <button
+                           type="button"
+                           className="avatar avatar-placeholder cursor-pointer"
+                           aria-haspopup="true"
+                           aria-expanded="false"
+                        >
+                           <div className="bg-primary/10 text-primary size-8 rounded-full flex items-center justify-center">
+                              <span className="text-md uppercase pb-0.5">
+                                 {initials}
+                              </span>
+                           </div>
+                        </button>
+
+                        <ul className="dropdown-menu dropdown-open:opacity-100 hidden min-w-52 mt-2 rounded-box bg-base-100 shadow-lg border border-base-200 p-2 absolute right-0 top-full z-50">
+                           <li>
+                              <button
+                                 className="dropdown-item"
+                                 onClick={() =>
+                                    alert("Settings clicked")
+                                 } /* Placeholder for settings action */
+                              >
+                                 Settings
+                              </button>
+                           </li>
+
+                           <li>
+                              <button
+                                 className="dropdown-item text-error"
+                                 onClick={() => alert("Logout clicked")}
+                              >
+                                 Logout
+                              </button>
+                           </li>
+                        </ul>
                      </div>
                   </div>
                </header>
