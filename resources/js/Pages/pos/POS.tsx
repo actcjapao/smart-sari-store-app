@@ -282,7 +282,7 @@ const Products = () => {
       <>
          <div className="flex gap-4">
             <div className="w-[70%]">
-               <div className="card bg-base-100 shadow-sm">
+               <div className="card bg-base-100 border border-gray-200 shadow-sm">
                   <div className="card-body">
                      <div className="relative max-w-sm">
                         <input
@@ -395,66 +395,92 @@ const Products = () => {
                            </button>
                         </div>
                      </div>
-                     <div className="card w-full mt-2">
-                        <div className="overflow-x-auto">
-                           <table className="table table-sm">
-                              <thead>
+                  </div>
+               </div>
+
+               {/* ADDED ITEMS TABLE */}
+               <div
+                  data-theme="mintlify"
+                  className="card bg-base-100 border border-gray-200 shadow-md mt-3"
+               >
+                  <div className="card-body">
+                     <div className="flex items-center justify-between">
+                        <div>
+                           <h2 className="font-semibold text-lg">
+                              List of added items
+                           </h2>
+
+                           <p className="text-sm text-base-content/60">
+                              Review the items you&apos;ve added to the cart.
+                           </p>
+                        </div>
+                     </div>
+
+                     <div className="overflow-x-auto mt-4">
+                        <table className="table table-sm min-w-full">
+                           <thead className="bg-base-200/80 text-base-content/60 text-xs uppercase tracking-wide">
+                              <tr>
+                                 <th>Name</th>
+                                 <th>Quantity</th>
+                                 <th>Price</th>
+                                 <th>Total</th>
+                                 <th className="text-right">Actions</th>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              {/* Selected products will be populated here */}
+                              {cartItems.length === 0 ? (
                                  <tr>
-                                    <th>Name</th>
-                                    <th>Quantity</th>
-                                    <th>Price</th>
-                                    <th>Total</th>
-                                    <th className="text-right">Actions</th>
+                                    <td
+                                       colSpan={5}
+                                       className="text-center text-sm text-gray-500"
+                                    >
+                                       No items added yet.
+                                    </td>
                                  </tr>
-                              </thead>
-                              <tbody>
-                                 {/* Selected products will be populated here */}
-                                 {cartItems.length === 0 ? (
-                                    <tr>
-                                       <td
-                                          colSpan={5}
-                                          className="text-center text-sm text-gray-500"
-                                       >
-                                          No items added yet.
+                              ) : (
+                                 cartItems.map((item) => (
+                                    <tr
+                                       key={item.product.uuid}
+                                       className="hover:bg-base-200 transition-colors"
+                                    >
+                                       <td className="text-sm font-semibold text-base-content">
+                                          {item.product.name}
+                                       </td>
+                                       <td className="text-sm text-base-content/85 font-medium">
+                                          {item.quantity}
+                                       </td>
+                                       <td className="text-sm text-base-content/85 font-medium">
+                                          ₱
+                                          {Number(
+                                             item.product.selling_price,
+                                          ).toFixed(2)}
+                                       </td>
+                                       <td className="text-sm text-base-content/85 font-medium">
+                                          ₱
+                                          {(
+                                             item.product.selling_price *
+                                             item.quantity
+                                          ).toFixed(2)}
+                                       </td>
+                                       <td className="text-right">
+                                          <button
+                                             className="btn btn-circle btn-text btn-sm"
+                                             aria-label="Delete"
+                                             onClick={() =>
+                                                handleRemoveItem(
+                                                   item.product.uuid,
+                                                )
+                                             }
+                                          >
+                                             <span className="icon-[tabler--trash] size-5"></span>
+                                          </button>
                                        </td>
                                     </tr>
-                                 ) : (
-                                    cartItems.map((item) => (
-                                       <tr key={item.product.uuid}>
-                                          <td>{item.product.name}</td>
-                                          <td>{item.quantity}</td>
-                                          <td>
-                                             ₱
-                                             {Number(
-                                                item.product.selling_price,
-                                             ).toFixed(2)}
-                                          </td>
-                                          <td>
-                                             ₱
-                                             {(
-                                                item.product.selling_price *
-                                                item.quantity
-                                             ).toFixed(2)}
-                                          </td>
-                                          <td className="text-right">
-                                             <button
-                                                className="btn btn-circle btn-text btn-sm"
-                                                aria-label="Delete"
-                                                onClick={() =>
-                                                   handleRemoveItem(
-                                                      item.product.uuid,
-                                                   )
-                                                }
-                                             >
-                                                <span className="icon-[tabler--trash] size-5"></span>
-                                             </button>
-                                          </td>
-                                       </tr>
-                                    ))
-                                 )}
-                              </tbody>
-                           </table>
-                        </div>
+                                 ))
+                              )}
+                           </tbody>
+                        </table>
                      </div>
                   </div>
                </div>
