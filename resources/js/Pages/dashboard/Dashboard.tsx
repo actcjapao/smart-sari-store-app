@@ -129,39 +129,39 @@ const Dashboard = ({ dashboardData }: DashboardProps) => {
             {/* Should be fetched from server */}
             {/* Keep cards visually different */}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
                {/* TOTAL PRODUCTS */}
-               <div className="card bg-base-100 shadow-sm">
+               <div className="card bg-base-100 shadow-md border border-base-200 transition-shadow">
                   <div className="card-body">
                      <div className="flex items-center justify-between">
                         <div>
-                           <p className="text-sm text-base-content/60">
+                           <p className="text-xs font-semibold text-base-content/50 uppercase tracking-wide">
                               Products
                            </p>
 
-                           <h2 className="text-xl font-bold mt-2">
+                           <h2 className="text-2xl font-bold mt-2 text-base-content/85">
                               {dashboardData.metrics.total_products}
                            </h2>
                         </div>
 
-                        <div className="bg-warning/10 text-warning pt-3 px-3 pb-1 rounded-xl">
-                           <span className="icon-[tabler--package] size-7"></span>
+                        <div className="bg-warning/15 text-warning p-3 pb-2 rounded-lg">
+                           <span className="icon-[tabler--package] size-6"></span>
                         </div>
                      </div>
 
-                     <p className="text-xs text-base-content/60 mt-4">
+                     <p className="text-xs text-base-content/50 mt-4">
                         Active inventory items
                      </p>
                   </div>
                </div>
 
                {/* TOTAL SALES COST TRANSACTIONS */}
-               <div className="card bg-base-100 shadow-sm">
+               <div className="card bg-base-100 shadow-md border border-base-200 transition-shadow">
                   <div className="card-body">
                      <div className="flex items-start justify-between gap-3">
                         {/* CONTENT */}
                         <div className="min-w-0 flex-1">
-                           <p className="text-sm text-base-content/60">
+                           <p className="text-xs font-semibold text-base-content/50 uppercase tracking-wide">
                               Total Sales Cost
                            </p>
 
@@ -169,7 +169,7 @@ const Dashboard = ({ dashboardData }: DashboardProps) => {
                               truncate prevents overflow
                               break-all is optional for VERY huge values
                            */}
-                           <h2 className="text-xl font-bold mt-2 truncate">
+                           <h2 className="text-xl font-bold mt-2 truncate text-base-content/85">
                               {formatCurrency(
                                  dashboardData.metrics.total_sales_cost,
                               )}
@@ -178,24 +178,24 @@ const Dashboard = ({ dashboardData }: DashboardProps) => {
 
                         {/* ICON */}
                         {/* shrink-0 prevents icon compression */}
-                        <div className="shrink-0 bg-accent/15 text-accent pt-3 px-3 pb-1 rounded-xl">
-                           <span className="icon-[tabler--wallet] size-7"></span>
+                        <div className="shrink-0 bg-accent/15 text-accent p-3 pb-2 rounded-lg">
+                           <span className="icon-[tabler--wallet] size-6"></span>
                         </div>
                      </div>
 
-                     <p className="text-xs text-base-content/60 mt-4">
+                     <p className="text-xs text-base-content/50 mt-4">
                         Total expenses for sold products
                      </p>
                   </div>
                </div>
 
                {/* TOTAL SALES TRANSACTIONS */}
-               <div className="card bg-base-100 shadow-sm">
+               <div className="card bg-base-100 shadow-md border border-base-200 transition-shadow">
                   <div className="card-body">
                      <div className="flex items-start justify-between gap-3">
                         {/* CONTENT */}
                         <div className="min-w-0 flex-1">
-                           <p className="text-sm text-base-content/60">
+                           <p className="text-xs font-semibold text-base-content/50 uppercase tracking-wide">
                               Total Sales
                            </p>
 
@@ -203,7 +203,7 @@ const Dashboard = ({ dashboardData }: DashboardProps) => {
                               truncate prevents overflow
                               break-all is optional for VERY huge values
                            */}
-                           <h2 className="text-xl font-bold mt-2 truncate">
+                           <h2 className="text-xl font-bold mt-2 truncate text-base-content/85">
                               {formatCurrency(
                                  dashboardData.metrics.total_sales,
                               )}
@@ -212,39 +212,39 @@ const Dashboard = ({ dashboardData }: DashboardProps) => {
 
                         {/* ICON */}
                         {/* shrink-0 prevents icon compression */}
-                        <div className="shrink-0 bg-success/15 text-success pt-3 px-3 pb-1 rounded-xl">
-                           <span className="icon-[tabler--shopping-cart] size-7"></span>
+                        <div className="shrink-0 bg-success/15 text-success p-3 pb-2 rounded-lg">
+                           <span className="icon-[tabler--shopping-cart] size-6"></span>
                         </div>
                      </div>
 
-                     <p className="text-xs text-success mt-4">
+                     <p className="text-xs text-success/80 mt-4 font-medium">
                         +12% compared last week
                      </p>
                   </div>
                </div>
 
                {/* TOTAL PROFIT */}
-               <div className="card bg-base-100 border border-success/20 shadow-sm bg-linear-to-br from-success/5 to-transparent">
+               <div className="card bg-linear-to-br from-success/5 to-base-100 border border-success/20 shadow-md transition-shadow">
                   <div className="card-body">
                      <div className="flex items-center justify-between">
                         <div>
-                           <p className="text-sm text-base-content/60">
+                           <p className="text-xs font-semibold text-success/60 uppercase tracking-wide">
                               Net Profit
                            </p>
 
-                           <h2 className="text-xl font-bold text-success mt-2">
+                           <h2 className="text-2xl font-bold text-success mt-2">
                               {formatCurrency(
                                  dashboardData.metrics.total_profit,
                               )}
                            </h2>
                         </div>
 
-                        <div className="bg-success/15 text-success pt-3 px-3 pb-1 rounded-xl">
-                           <span className="icon-[tabler--chart-line] size-7"></span>
+                        <div className="bg-success/15 text-success p-3 pb-2 rounded-lg">
+                           <span className="icon-[tabler--chart-line] size-6"></span>
                         </div>
                      </div>
 
-                     <p className="text-xs text-success mt-4">
+                     <p className="text-xs text-success/60 mt-4">
                         Business is profitable
                      </p>
                   </div>
@@ -258,7 +258,7 @@ const Dashboard = ({ dashboardData }: DashboardProps) => {
 
             <div className="grid grid-cols-1 gap-4">
                {/* SALES + PROFIT TREND */}
-               <div className="xl:col-span-2 card bg-base-100 border border-gray-200 shadow-sm">
+               <div className="xl:col-span-2 card bg-base-100 border border-base-200 shadow-md">
                   <div className="card-body">
                      <div className="flex items-center justify-between mb-6">
                         <div>
