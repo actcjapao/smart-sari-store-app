@@ -431,7 +431,7 @@ const Dashboard = ({ dashboardData }: DashboardProps) => {
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                {/* WEEKLY SALES TABLE */}
-               <div className="card bg-base-100 border border-gray-200 shadow-sm">
+               <div className="card bg-base-100 border border-gray-200 shadow-md">
                   <div className="card-body">
                      <div className="flex items-center justify-between">
                         <div>
@@ -450,13 +450,15 @@ const Dashboard = ({ dashboardData }: DashboardProps) => {
                      </div>
 
                      <div className="overflow-x-auto mt-4">
-                        <table className="table table-sm">
-                           <thead className="bg-base-200">
+                        <table className="table table-sm min-w-full">
+                           <thead className="bg-base-200/80 text-base-content/60 text-xs uppercase tracking-wide">
                               <tr>
-                                 <th>Date</th>
-                                 <th>Day</th>
-                                 <th className="text-right">Daily Sales</th>
-                                 <th className="text-right">Profit</th>
+                                 <th className="py-3">Date</th>
+                                 <th className="py-3">Day</th>
+                                 <th className="py-3 text-right">
+                                    Daily Sales
+                                 </th>
+                                 <th className="py-3 text-right">Profit</th>
                               </tr>
                            </thead>
 
@@ -465,17 +467,21 @@ const Dashboard = ({ dashboardData }: DashboardProps) => {
                                  (sale: WeeklySales, index) => (
                                     <tr
                                        key={index}
-                                       className="hover:bg-base-200"
+                                       className="hover:bg-base-200 transition-colors"
                                     >
-                                       <td>{sale.date}</td>
+                                       <td className="text-sm font-medium text-base-content">
+                                          {sale.date}
+                                       </td>
 
-                                       <td>{sale.day}</td>
+                                       <td className="text-sm text-base-content/75">
+                                          {sale.day}
+                                       </td>
 
-                                       <td className="text-right font-medium">
+                                       <td className="text-right text-sm font-semibold text-base-content/90">
                                           {formatCurrency(sale.total_sales)}
                                        </td>
 
-                                       <td className="text-right text-success font-semibold">
+                                       <td className="text-right text-sm font-semibold text-success">
                                           {formatCurrency(sale.total_profit)}
                                        </td>
                                     </tr>
@@ -488,7 +494,7 @@ const Dashboard = ({ dashboardData }: DashboardProps) => {
                </div>
 
                {/* TOP PRODUCTS */}
-               <div className="card bg-base-100 border border-gray-200 shadow-sm">
+               <div className="card bg-base-100 border border-gray-200 shadow-md">
                   <div className="card-body">
                      <div className="flex items-center justify-between">
                         <div>
@@ -507,14 +513,14 @@ const Dashboard = ({ dashboardData }: DashboardProps) => {
                      </div>
 
                      <div className="overflow-x-auto mt-4">
-                        <table className="table table-sm">
-                           <thead className="bg-base-200">
+                        <table className="table table-sm min-w-full">
+                           <thead className="bg-base-200/80 text-base-content/60 text-xs uppercase tracking-wide">
                               <tr>
-                                 <th>Product</th>
-                                 <th>Brand</th>
-                                 <th className="text-center">Today</th>
-                                 <th className="text-center">Overall</th>
-                                 <th className="text-center">Stock</th>
+                                 <th className="py-3">Product</th>
+                                 <th className="py-3">Brand</th>
+                                 <th className="py-3 text-center">Today</th>
+                                 <th className="py-3 text-center">Overall</th>
+                                 <th className="py-3 text-center">Stock</th>
                               </tr>
                            </thead>
 
@@ -523,19 +529,21 @@ const Dashboard = ({ dashboardData }: DashboardProps) => {
                                  (product, index) => (
                                     <tr
                                        key={index}
-                                       className="hover:bg-base-200"
+                                       className="hover:bg-base-200 transition-colors"
                                     >
-                                       <td className="font-medium">
+                                       <td className="text-sm font-semibold text-base-content">
                                           {product.name}
                                        </td>
 
-                                       <td>{product.brand ?? "--"}</td>
+                                       <td className="text-sm text-base-content/75">
+                                          {product.brand ?? "--"}
+                                       </td>
 
-                                       <td className="text-center">
+                                       <td className="text-center text-sm text-base-content/85 font-medium">
                                           {product.sales_today}
                                        </td>
 
-                                       <td className="text-center font-semibold">
+                                       <td className="text-center text-sm font-semibold text-base-content">
                                           {product.overall_sales}
                                        </td>
 
@@ -545,7 +553,7 @@ const Dashboard = ({ dashboardData }: DashboardProps) => {
 
                                        <td className="text-center">
                                           <span
-                                             className={`badge ${
+                                             className={`badge badge-sm text-sm ${
                                                 product.stock_left <= 15
                                                    ? "badge-error"
                                                    : "badge-success"
