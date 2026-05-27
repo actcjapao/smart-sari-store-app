@@ -413,14 +413,20 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
 
    return (
       <>
-         <div className="card bg-base-100 shadow-sm">
+         <div className="card bg-base-100 border border-gray-200 shadow-md mt-3">
             <div className="card-body">
-               <div className="flex items-center justify-between mb-4">
-                  <h3 className="card-title">Product List</h3>
+               <div className="flex items-center justify-between">
+                  <div>
+                     <h2 className="font-semibold text-lg">Products</h2>
+
+                     <p className="text-sm text-base-content/60">
+                        List of products available in your store
+                     </p>
+                  </div>
 
                   <button
                      data-theme="mintlify"
-                     className="btn btn-primary btn-sm py-5 px-6"
+                     className="btn btn-primary btn-sm py-4 ps-3 pe-4"
                      aria-haspopup="dialog"
                      aria-expanded="false"
                      aria-controls="product-modal"
@@ -432,194 +438,196 @@ const Products = ({ store_id, products }: ProductsPageProps) => {
                   </button>
                </div>
 
-               <div className="card w-full">
-                  <div className="overflow-x-auto">
-                     <table className="table table-sm">
-                        <thead>
-                           <tr>
-                              <th>Name</th>
-                              <th>Brand</th>
-                              <th>Cost Price</th>
-                              <th>Selling Price</th>
-                              <th>Profit</th>
-                              <th>Stock</th>
-                              <th>Status</th>
-                              <th className="text-right">Actions</th>
-                           </tr>
-                        </thead>
-                        <tbody>
-                           {productsState.data.length > 0 ? (
-                              productsState.data.map((product) => {
-                                 const stockValue = Number(
-                                    product.stock_quantity,
-                                 );
-                                 const status = renderStatusMeta(stockValue);
-
-                                 return (
-                                    <tr key={product.uuid}>
-                                       <td>{product.name}</td>
-                                       <td>{product.brand || "-"}</td>
-                                       <td>
-                                          ₱
-                                          {Number(product.cost_price).toFixed(
-                                             2,
-                                          )}
-                                       </td>
-                                       <td>
-                                          ₱
-                                          {Number(
-                                             product.selling_price,
-                                          ).toFixed(2)}
-                                       </td>
-                                       <td>
-                                          ₱
-                                          {(
-                                             Number(product.selling_price) -
-                                             Number(product.cost_price)
-                                          ).toFixed(2)}
-                                       </td>
-                                       <td>{product.stock_quantity}</td>
-                                       <td>
-                                          <span
-                                             className={`badge ${status.style} text-xs`}
-                                          >
-                                             {status.label}
-                                          </span>
-                                       </td>
-                                       <td className="text-right space-x-1">
-                                          <button
-                                             className="btn btn-circle btn-text btn-sm"
-                                             aria-label="Add stocks"
-                                             aria-controls="stock-modal"
-                                             data-overlay="#stock-modal"
-                                             onClick={() =>
-                                                openAddStockModal(product)
-                                             }
-                                          >
-                                             <span className="icon-[tabler--cube-plus] size-5"></span>
-                                          </button>
-                                          <button
-                                             className="btn btn-circle btn-text btn-sm"
-                                             aria-label="Edit"
-                                             aria-controls="product-modal"
-                                             data-overlay="#product-modal"
-                                             onClick={() =>
-                                                openEditProductModal(product)
-                                             }
-                                          >
-                                             <span className="icon-[tabler--pencil] size-5"></span>
-                                          </button>
-                                          <button
-                                             className="btn btn-circle btn-text btn-sm"
-                                             aria-label="Delete"
-                                          >
-                                             <span className="icon-[tabler--trash] size-5"></span>
-                                          </button>
-                                          <button
-                                             className="btn btn-circle btn-text btn-sm"
-                                             aria-label="More"
-                                          >
-                                             <span className="icon-[tabler--dots-vertical] size-5"></span>
-                                          </button>
-                                       </td>
-                                    </tr>
-                                 );
-                              })
-                           ) : (
-                              <tr>
-                                 <td colSpan={8} className="text-center py-8">
-                                    <p className="text-base-content/50">
-                                       No products found
-                                    </p>
-                                 </td>
-                              </tr>
-                           )}
-                        </tbody>
-                     </table>
-                  </div>
-               </div>
-
-               {/* Pagination */}
-               {productsState.last_page > 1 && (
-                  <div className="flex items-center justify-between mt-2 pt-4 border-base-300">
-                     <div className="text-sm text-gray-500">
-                        Showing {productsState.from} to {productsState.to} of{" "}
-                        {productsState.total} products
-                     </div>
-
-                     <div className="flex gap-2">
-                        {/* Previous Button */}
-                        {productsState.prev_page_url ? (
-                           <Link
-                              href={productsState.prev_page_url}
-                              className="btn btn-sm btn-outline"
-                              preserveScroll
-                           >
-                              <span className="icon-[tabler--chevron-left] size-4"></span>
-                              Previous
-                           </Link>
-                        ) : (
-                           <button
-                              className="btn btn-sm btn-outline opacity-50 cursor-not-allowed"
-                              disabled
-                           >
-                              <span className="icon-[tabler--chevron-left] size-4"></span>
-                              Previous
-                           </button>
-                        )}
-
-                        {/* Page Numbers */}
-                        <div className="flex gap-1">
-                           {productsState.links.map((link, idx) => {
-                              // Skip the first and last links (prev/next)
-                              if (
-                                 link.label.includes("Previous") ||
-                                 link.label.includes("Next") ||
-                                 link.label === "&laquo;" ||
-                                 link.label === "&raquo;"
-                              ) {
-                                 return null;
-                              }
+               <div className="overflow-x-auto mt-4">
+                  <table className="table min-w-full">
+                     <thead className="bg-base-200/80 text-base-content/60 text-xs uppercase tracking-wide">
+                        <tr>
+                           <th>Name</th>
+                           <th>Brand</th>
+                           <th>Cost Price</th>
+                           <th>Selling Price</th>
+                           <th>Profit</th>
+                           <th>Stock</th>
+                           <th>Status</th>
+                           <th className="text-right">Actions</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        {productsState.data.length > 0 ? (
+                           productsState.data.map((product) => {
+                              const stockValue = Number(product.stock_quantity);
+                              const status = renderStatusMeta(stockValue);
 
                               return (
-                                 <Link
-                                    key={idx}
-                                    href={link.url || "#"}
-                                    className={`btn btn-sm ${
-                                       link.active
-                                          ? "custom-primary"
-                                          : "btn-outline"
-                                    }`}
-                                    preserveScroll
+                                 <tr
+                                    key={product.uuid}
+                                    className="hover:bg-base-200 transition-colors"
                                  >
-                                    {link.label}
-                                 </Link>
+                                    <td className="text-sm font-semibold text-base-content">
+                                       {product.name}
+                                    </td>
+                                    <td className="text-sm font-semibold text-base-content">
+                                       {product.brand || "-"}
+                                    </td>
+                                    <td className="text-sm text-base-content/85">
+                                       ₱{Number(product.cost_price).toFixed(2)}
+                                    </td>
+                                    <td className="text-sm text-base-content/85">
+                                       ₱
+                                       {Number(product.selling_price).toFixed(
+                                          2,
+                                       )}
+                                    </td>
+                                    <td className="text-sm text-base-content/85">
+                                       ₱
+                                       {(
+                                          Number(product.selling_price) -
+                                          Number(product.cost_price)
+                                       ).toFixed(2)}
+                                    </td>
+                                    <td className="text-sm text-base-content/85">
+                                       {product.stock_quantity}
+                                    </td>
+                                    <td>
+                                       <span
+                                          className={`badge ${status.style} text-xs`}
+                                       >
+                                          {status.label}
+                                       </span>
+                                    </td>
+                                    <td className="text-right space-x-1">
+                                       <button
+                                          className="btn btn-circle btn-text btn-sm"
+                                          aria-label="Add stocks"
+                                          aria-controls="stock-modal"
+                                          data-overlay="#stock-modal"
+                                          onClick={() =>
+                                             openAddStockModal(product)
+                                          }
+                                       >
+                                          <span className="icon-[tabler--cube-plus] size-5"></span>
+                                       </button>
+                                       <button
+                                          className="btn btn-circle btn-text btn-sm"
+                                          aria-label="Edit"
+                                          aria-controls="product-modal"
+                                          data-overlay="#product-modal"
+                                          onClick={() =>
+                                             openEditProductModal(product)
+                                          }
+                                       >
+                                          <span className="icon-[tabler--pencil] size-5"></span>
+                                       </button>
+                                       <button
+                                          className="btn btn-circle btn-text btn-sm"
+                                          aria-label="Delete"
+                                       >
+                                          <span className="icon-[tabler--trash] size-5"></span>
+                                       </button>
+                                       <button
+                                          className="btn btn-circle btn-text btn-sm"
+                                          aria-label="More"
+                                       >
+                                          <span className="icon-[tabler--dots-vertical] size-5"></span>
+                                       </button>
+                                    </td>
+                                 </tr>
                               );
-                           })}
+                           })
+                        ) : (
+                           <tr>
+                              <td colSpan={8} className="text-center py-8">
+                                 <p className="text-base-content/50">
+                                    No products found
+                                 </p>
+                              </td>
+                           </tr>
+                        )}
+                     </tbody>
+                  </table>
+
+                  {/* Pagination */}
+                  {productsState.last_page > 1 && (
+                     <div className="flex items-center justify-between mt-4 mx-4">
+                        <div className="text-sm text-gray-500">
+                           Showing {productsState.from} to {productsState.to} of{" "}
+                           {productsState.total} products
                         </div>
 
-                        {/* Next Button */}
-                        {productsState.next_page_url ? (
-                           <Link
-                              href={productsState.next_page_url}
-                              className="btn btn-sm btn-outline"
-                              preserveScroll
-                           >
-                              Next
-                              <span className="icon-[tabler--chevron-right] size-4"></span>
-                           </Link>
-                        ) : (
-                           <button
-                              className="btn btn-sm btn-outline opacity-50 cursor-not-allowed"
-                              disabled
-                           >
-                              Next
-                              <span className="icon-[tabler--chevron-right] size-4"></span>
-                           </button>
-                        )}
+                        <div className="flex gap-2">
+                           {/* Previous Button */}
+                           {productsState.prev_page_url ? (
+                              <Link
+                                 href={productsState.prev_page_url}
+                                 className="btn btn-sm btn-outline"
+                                 preserveScroll
+                              >
+                                 <span className="icon-[tabler--chevron-left] size-4"></span>
+                                 Previous
+                              </Link>
+                           ) : (
+                              <button
+                                 className="btn btn-sm btn-outline opacity-50 cursor-not-allowed"
+                                 disabled
+                              >
+                                 <span className="icon-[tabler--chevron-left] size-4"></span>
+                                 Previous
+                              </button>
+                           )}
+
+                           {/* Page Numbers */}
+                           <div className="flex gap-1">
+                              {productsState.links.map((link, idx) => {
+                                 // Skip the first and last links (prev/next)
+                                 if (
+                                    link.label.includes("Previous") ||
+                                    link.label.includes("Next") ||
+                                    link.label === "&laquo;" ||
+                                    link.label === "&raquo;"
+                                 ) {
+                                    return null;
+                                 }
+
+                                 return (
+                                    <Link
+                                       key={idx}
+                                       href={link.url || "#"}
+                                       className={`btn btn-sm ${
+                                          link.active
+                                             ? "custom-primary"
+                                             : "btn-outline"
+                                       }`}
+                                       preserveScroll
+                                    >
+                                       {link.label}
+                                    </Link>
+                                 );
+                              })}
+                           </div>
+
+                           {/* Next Button */}
+                           {productsState.next_page_url ? (
+                              <Link
+                                 href={productsState.next_page_url}
+                                 className="btn btn-sm btn-outline"
+                                 preserveScroll
+                              >
+                                 Next
+                                 <span className="icon-[tabler--chevron-right] size-4"></span>
+                              </Link>
+                           ) : (
+                              <button
+                                 className="btn btn-sm btn-outline opacity-50 cursor-not-allowed"
+                                 disabled
+                              >
+                                 Next
+                                 <span className="icon-[tabler--chevron-right] size-4"></span>
+                              </button>
+                           )}
+                        </div>
                      </div>
-                  </div>
-               )}
+                  )}
+               </div>
             </div>
          </div>
 
