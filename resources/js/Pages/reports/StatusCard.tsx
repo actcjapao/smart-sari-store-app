@@ -17,8 +17,46 @@ const StatusCard: React.FC<StatCardProps> = ({
    colorClasses,
    tooltip,
 }) => {
+   const cardStyle = (label: string) => {
+      switch (label.toLowerCase()) {
+         case "profit":
+            return "bg-linear-to-br from-success/15 to-base-100 border-success/30";
+         default:
+            return "bg-base-100 border-base-200";
+      }
+   };
+
+   const labelStyle = (label: string) => {
+      switch (label.toLowerCase()) {
+         case "profit":
+            return "text-success/60";
+         default:
+            return "text-base-content/50";
+      }
+   };
+
+   const toolTipStyle = (label: string) => {
+      switch (label.toLowerCase()) {
+         case "profit":
+            return "text-success/60";
+         default:
+            return "text-base-content/40";
+      }
+   };
+
+   const valueStyle = (label: string) => {
+      switch (label.toLowerCase()) {
+         case "profit":
+            return "font-bold text-success";
+         default:
+            return "font-semibold text-base-content/85";
+      }
+   };
+
    return (
-      <div className="bg-white rounded-box flex gap-4 shadow-sm px-4 py-3">
+      <div
+         className={`rounded-box border px-4 py-3 flex gap-4 shadow-md transition-shadow ${cardStyle(label)}`}
+      >
          {/* Icon */}
          <div className="avatar avatar-placeholder">
             <div className={`rounded-field size-11.5 ${colorClasses}`}>
@@ -30,12 +68,16 @@ const StatusCard: React.FC<StatCardProps> = ({
          <div className="flex flex-col">
             {/* Label + Info */}
             <div className="flex items-center gap-1 relative group">
-               <span className="text-base-content/50 text-sm font-medium">
+               <p
+                  className={`text-xs font-semibold uppercase tracking-wide ${labelStyle(label)}`}
+               >
                   {label}
-               </span>
+               </p>
 
                {/* Info icon */}
-               <span className="icon-[tabler--info-circle] size-4 text-base-content/40 cursor-pointer"></span>
+               <span
+                  className={`icon-[tabler--info-circle] size-4 cursor-pointer ${toolTipStyle(label)}`}
+               ></span>
 
                {/* Tooltip */}
                <div className="absolute left-0 top-5 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10 shadow-md">
@@ -44,9 +86,11 @@ const StatusCard: React.FC<StatCardProps> = ({
             </div>
 
             {/* Value */}
-            <span className="text-base-content text-2xl font-semibold">
-               {isLoading ? <div className="skeleton h-8 w-30"></div> : value}
-            </span>
+            {isLoading ? (
+               <div className="skeleton h-8 w-30"></div>
+            ) : (
+               <h2 className={`text-2xl ${valueStyle(label)}`}>{value}</h2>
+            )}
          </div>
       </div>
    );

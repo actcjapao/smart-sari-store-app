@@ -147,7 +147,7 @@ const Reports = () => {
       <>
          <div className="flex gap-4">
             <div className="w-[25%]">
-               <label className="block text-sm font-medium mt-2">
+               <label className="block text-xs font-semibold text-base-content/50 uppercase tracking-wide mt-2">
                   Select date range
                </label>
                <select
@@ -208,7 +208,9 @@ const Reports = () => {
             </div>
          )}
 
-         <h5 className="font-semibold mt-5">Summary</h5>
+         <h2 className="font-semibold text-lg text-base-content/80 mt-4 ms-2">
+            Summary
+         </h2>
          <div className="flex gap-4 mt-2">
             <div className="w-[33%]">
                <StatusCard
@@ -235,7 +237,7 @@ const Reports = () => {
                   label="Profit"
                   isLoading={isLoading}
                   value={formatCurrency(summary.total_profit)}
-                  icon="icon-[tabler--chart-bar]"
+                  icon="icon-[tabler--chart-line]"
                   colorClasses="text-success bg-success/20"
                   tooltip="Total profit for the selected date range"
                />
@@ -251,7 +253,8 @@ const Reports = () => {
 
                      <p className="text-sm text-base-content/60">
                         List of sales based on the selected date range. Click
-                        the eye icon to view details of each sale transaction.
+                        the list details icon to view details of each sale
+                        transaction.
                      </p>
                   </div>
                </div>
