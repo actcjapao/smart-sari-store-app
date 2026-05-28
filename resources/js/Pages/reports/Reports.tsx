@@ -242,12 +242,26 @@ const Reports = () => {
             </div>
          </div>
 
-         <div className="mt-5">
-            <h5 className="font-semibold mb-1">Sales Record</h5>
-            <div className="card w-full mt-2">
-               <div className="overflow-x-auto">
-                  <table className="table table-sm">
-                     <thead className="bg-gray-100">
+         {/* SALES TABLE */}
+         <div className="card bg-base-100 border border-gray-200 shadow-md mt-5">
+            <div className="card-body">
+               <div className="flex items-center justify-between">
+                  <div>
+                     <h2 className="font-semibold text-lg">Sales record</h2>
+
+                     <p className="text-sm text-base-content/60">
+                        List of sales based on the selected date range. Click
+                        the eye icon to view details of each sale transaction.
+                     </p>
+                  </div>
+               </div>
+
+               <div className="overflow-x-auto mt-5">
+                  <table className="table table-sm min-w-full">
+                     <thead
+                        data-theme="mintlify"
+                        className="bg-base-200/80 text-base-content/60 text-xs uppercase tracking-wide"
+                     >
                         <tr>
                            <th>Date</th>
                            <th>Method</th>
@@ -257,6 +271,7 @@ const Reports = () => {
                            <th className="text-right">Actions</th>
                         </tr>
                      </thead>
+
                      <tbody>
                         {paginatedSales === null ||
                         paginatedSales?.sales?.data.length === 0 ? (
@@ -296,20 +311,26 @@ const Reports = () => {
                            paginatedSales?.sales?.data.map((record: Sale) => (
                               <tr
                                  key={record.uuid}
-                                 className="cursor-pointer hover:bg-base-200"
+                                 className="hover:bg-base-200 transition-colors"
                               >
-                                 <td>{formatDate(record.created_at)}</td>
-                                 <td>
+                                 <td className="text-sm font-medium text-base-content">
+                                    {formatDate(record.created_at)}
+                                 </td>
+                                 <td className="text-sm text-base-content/75">
                                     {record.payment_method
                                        .charAt(0)
                                        .toUpperCase() +
                                        record.payment_method.slice(1)}
                                  </td>
-                                 <td>{formatCurrency(record.total_amount)}</td>
-                                 <td>
+                                 <td className="text-sm font-medium text-base-content">
+                                    {formatCurrency(record.total_amount)}
+                                 </td>
+                                 <td className="text-sm text-base-content/75">
                                     {formatCurrency(record.payment_amount)}
                                  </td>
-                                 <td>{formatCurrency(record.change_amount)}</td>
+                                 <td className="text-sm text-base-content/75">
+                                    {formatCurrency(record.change_amount)}
+                                 </td>
                                  <td className="text-right space-x-1">
                                     <button
                                        className="btn btn-circle btn-text btn-sm"
@@ -328,91 +349,97 @@ const Reports = () => {
                         )}
                      </tbody>
                   </table>
+
+                  {/* Pagination */}
+                  {paginatedSales !== null &&
+                     paginatedSales.sales.last_page > 1 && (
+                        <div className="flex items-center justify-between mt-2 pt-4 px-3 border-base-300">
+                           <div className="text-sm text-gray-500">
+                              Showing {paginatedSales?.sales.from} to{" "}
+                              {paginatedSales?.sales.to} of{" "}
+                              {paginatedSales?.sales.total} products
+                           </div>
+
+                           <div className="flex gap-2">
+                              {/* Previous Button */}
+                              {paginatedSales.sales.prev_page_url ? (
+                                 <button
+                                    className="btn btn-sm btn-outline"
+                                    onClick={() =>
+                                       navigatePagination(
+                                          paginatedSales.sales.prev_page_url,
+                                       )
+                                    }
+                                 >
+                                    <span className="icon-[tabler--chevron-left] size-4"></span>
+                                    Previous
+                                 </button>
+                              ) : (
+                                 <button
+                                    className="btn btn-sm btn-outline opacity-50 cursor-not-allowed"
+                                    disabled
+                                 >
+                                    <span className="icon-[tabler--chevron-left] size-4"></span>
+                                    Previous
+                                 </button>
+                              )}
+
+                              {/* Page Numbers */}
+                              <div className="flex gap-1">
+                                 {paginatedSales.sales.links.map(
+                                    (link, idx) => {
+                                       // Skip the first and last links (prev/next)
+                                       if (
+                                          link.label.includes("Previous") ||
+                                          link.label.includes("Next") ||
+                                          link.label === "&laquo;" ||
+                                          link.label === "&raquo;"
+                                       ) {
+                                          return null;
+                                       }
+
+                                       return (
+                                          <button
+                                             key={idx}
+                                             className={`btn btn-sm btn-outline ${link.active ? "custom-primary" : ""}`}
+                                             onClick={() =>
+                                                navigatePagination(link.url)
+                                             }
+                                          >
+                                             {link.label}
+                                          </button>
+                                       );
+                                    },
+                                 )}
+                              </div>
+
+                              {/* Next Button */}
+                              {paginatedSales.sales.next_page_url ? (
+                                 <button
+                                    className="btn btn-sm btn-outline"
+                                    onClick={() =>
+                                       navigatePagination(
+                                          paginatedSales.sales.next_page_url,
+                                       )
+                                    }
+                                 >
+                                    Next
+                                    <span className="icon-[tabler--chevron-right] size-4"></span>
+                                 </button>
+                              ) : (
+                                 <button
+                                    className="btn btn-sm btn-outline opacity-50 cursor-not-allowed"
+                                    disabled
+                                 >
+                                    Next
+                                    <span className="icon-[tabler--chevron-right] size-4"></span>
+                                 </button>
+                              )}
+                           </div>
+                        </div>
+                     )}
                </div>
             </div>
-            {/* Pagination */}
-            {paginatedSales !== null && paginatedSales.sales.last_page > 1 && (
-               <div className="flex items-center justify-between mt-2 pt-4 border-base-300">
-                  <div className="text-sm text-gray-500">
-                     Showing {paginatedSales?.sales.from} to{" "}
-                     {paginatedSales?.sales.to} of {paginatedSales?.sales.total}{" "}
-                     products
-                  </div>
-
-                  <div className="flex gap-2">
-                     {/* Previous Button */}
-                     {paginatedSales.sales.prev_page_url ? (
-                        <button
-                           className="btn btn-sm btn-outline"
-                           onClick={() =>
-                              navigatePagination(
-                                 paginatedSales.sales.prev_page_url,
-                              )
-                           }
-                        >
-                           <span className="icon-[tabler--chevron-left] size-4"></span>
-                           Previous
-                        </button>
-                     ) : (
-                        <button
-                           className="btn btn-sm btn-outline opacity-50 cursor-not-allowed"
-                           disabled
-                        >
-                           <span className="icon-[tabler--chevron-left] size-4"></span>
-                           Previous
-                        </button>
-                     )}
-
-                     {/* Page Numbers */}
-                     <div className="flex gap-1">
-                        {paginatedSales.sales.links.map((link, idx) => {
-                           // Skip the first and last links (prev/next)
-                           if (
-                              link.label.includes("Previous") ||
-                              link.label.includes("Next") ||
-                              link.label === "&laquo;" ||
-                              link.label === "&raquo;"
-                           ) {
-                              return null;
-                           }
-
-                           return (
-                              <button
-                                 key={idx}
-                                 className={`btn btn-sm btn-outline ${link.active ? "custom-primary" : ""}`}
-                                 onClick={() => navigatePagination(link.url)}
-                              >
-                                 {link.label}
-                              </button>
-                           );
-                        })}
-                     </div>
-
-                     {/* Next Button */}
-                     {paginatedSales.sales.next_page_url ? (
-                        <button
-                           className="btn btn-sm btn-outline"
-                           onClick={() =>
-                              navigatePagination(
-                                 paginatedSales.sales.next_page_url,
-                              )
-                           }
-                        >
-                           Next
-                           <span className="icon-[tabler--chevron-right] size-4"></span>
-                        </button>
-                     ) : (
-                        <button
-                           className="btn btn-sm btn-outline opacity-50 cursor-not-allowed"
-                           disabled
-                        >
-                           Next
-                           <span className="icon-[tabler--chevron-right] size-4"></span>
-                        </button>
-                     )}
-                  </div>
-               </div>
-            )}
          </div>
 
          {/* Hidden modal open trigger */}
