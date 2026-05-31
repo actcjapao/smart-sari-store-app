@@ -89,3 +89,44 @@ debt_payments
 -amount
 -paid_at
 -payment_method (cash, card, gcash) -> default(cash)
+
+subscriptions
+
+- id
+- uuid
+- plan (trial, premium)
+- status
+   - trialing (trial phase)
+   - active (subscribe to premium)
+   - past_due (didn't renew the subscribed premium plan with the given grace period like 3 -5days)
+   - canceled (canceled the premium plan)
+   - expired (after the grace period from past_due state, if no payment renewal was made - mark as expired)
+- billing_cycle (monthly, yearly)
+- trial_start_at
+- trial_end_at
+- current_period_start
+- current_period_end
+- next_billing_at
+- cancel_at_period_end
+- canceled_at
+- created_at
+- updated_at
+
+payments
+// payment gateway related fields
+
+- id
+- uuid
+
+- subscription_id
+- amount
+- currency (peso)
+- status -- pending, paid, failed
+
+- payment_provider
+- provider_payment_id
+- provider_customer_id
+- provider_subscription_id
+
+- paid_at
+- created_at
