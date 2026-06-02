@@ -90,4 +90,31 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserStore::class);
     }
+
+    /**
+     * Get the subscription associated with this user.
+     */
+    public function subscription()
+    {
+        return $this->hasOne(Subscription::class);
+    }
+
+    /**
+     * Check if the user has an active subscription.
+     */
+    public function hasActiveSubscription(): bool
+    {
+        $subscription = $this->subscription;
+
+        if (!$subscription) {
+            return false;
+        }
+
+        // On scale, this logic will be changed
+        return match ($subscription->status) {
+            'active',
+            'trialing' => true,
+            default => false,
+        };
+    }
 }

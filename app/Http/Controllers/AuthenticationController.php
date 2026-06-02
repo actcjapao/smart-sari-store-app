@@ -51,6 +51,10 @@ class AuthenticationController extends Controller
                 ->with('error', 'Invalid email or password.');
         }
 
+        /**
+         * Store only necessary user info in session, avoid storing sensitive info like password
+         * Also be used in middleware to check if user is authenticated and to retrieve user info from DB
+         */
         $rawTokenObject = [
             'account_id' => $user->account_id
         ];
@@ -58,8 +62,6 @@ class AuthenticationController extends Controller
         $authenticatedUser = (object) [
             'token' => $userToken,
             'uuid' => $user->uuid,
-            'name' => $user->name,
-            'email' => $user->email,
         ];
 
         session()->put('authenticated_user', $authenticatedUser);

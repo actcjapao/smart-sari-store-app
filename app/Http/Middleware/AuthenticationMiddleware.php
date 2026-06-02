@@ -5,6 +5,9 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 
+// ADDED: Import User model
+use App\Models\User;
+
 class AuthenticationMiddleware
 {
     /**
@@ -32,6 +35,44 @@ class AuthenticationMiddleware
 
             return redirect('/login')->with('error', 'Kindly authenticate yourself first.');
         }
+
+        // ==================================================
+        // ADDED SECTION START
+        // ==================================================
+        //
+        // If authenticated:
+        // 1. Load the latest User record from DB
+        // 2. Load subscription together
+        // 3. Make the User object available to downstream middleware/controllers
+        //
+        if ($isAuthenticated) {
+            $sessionUser = session('authenticated_user');
+
+            $user = User::with('subscription')
+                ->where('uuid', $sessionUser->uuid)
+                ->first();
+
+            // User deleted from DB while session still exists
+            if (!$user) {
+                session()->forget('authenticated_user');
+
+                return redirect('/login')
+                    ->with('error', 'User account not found.');
+            }
+
+            /**
+             * Store authenticated user into request attributes
+             * so other middleware/controllers can access it
+             */
+            $request->attributes->set(
+                'authenticated_user',
+                $user
+            );
+        }
+        //
+        // ==================================================
+        // ADDED SECTION END
+        // ==================================================
 
         if ($isAuthenticated && in_array($path, ['login', 'registration'], true)) {
             return redirect('/dashboard');
