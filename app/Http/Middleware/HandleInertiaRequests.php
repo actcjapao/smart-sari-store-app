@@ -5,6 +5,8 @@ namespace App\Http\Middleware;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
+use App\Models\User;
+
 class HandleInertiaRequests extends Middleware
 {
     /**
@@ -35,11 +37,30 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        // Access coming from SubscriptionMiddleware, which is guaranteed to run before this middleware for protected routes
+        $user = session('authenticated_user_with_subscription');
+
         return array_merge(parent::share($request), [
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],
+
+            'auth' => [
+                'user' => $user ? [
+                    'user_uuid' => $user->uuid,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    // Add any other user attributes you want to share with Inertia
+                ] : null,
+            ],
+
+            'subscription' => $user ? [
+                'status' => $user->subscription?->status,
+                'plan' => $user->subscription?->plan,
+                'active' => $user->hasActiveSubscription(),
+                // Add any other subscription attributes you want to share with Inertia
+            ] : null,
         ]);
     }
 }

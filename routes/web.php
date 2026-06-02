@@ -9,7 +9,10 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\POSController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SubscriptionController;
+
 use App\Http\Middleware\AuthenticationMiddleware;
+use App\Http\Middleware\SubscriptionMiddleware;
 
 // Temp Route --> This route is intended for managing session data
 Route::get('/session/{operation?}', function($operation = null){
@@ -44,20 +47,37 @@ Route::get('/posts/{post}/edit', [CrudController::class, 'edit'])->name('posts.e
 Route::put('/posts/{post}', [CrudController::class, 'update'])->name('posts.update');
 Route::delete('/posts/{post}', [CrudController::class, 'destroy'])->name('posts.destroy');
 
+/**
+ * Purpose of not protecting with SubscriptionMiddleware:
+ * To allow users without active subscription to still access the login and registration pages, so they can log in or register and subscribe to a plan. 
+ * The subscription check will be applied to protected routes like dashboard, products, pos, reports, etc. to ensure only users with active subscription can access those features.
+ */
 Route::middleware([AuthenticationMiddleware::class])->group(function () {
     // Navigation Routes
     Route::get('/registration', [RegistrationController::class, 'loadPage'])->name('registration.page.load');
     Route::get('/login', [AuthenticationController::class, 'loadPage'])->name('login.page.load');
+    Route::get('/pricing', [SubscriptionController::class, 'loadPage'])->name('pricing.page.load');
+
+    // API Routes
+    Route::post('/api/register', [RegistrationController::class, 'register'])->name('registration');
+    Route::post('/api/login', [AuthenticationController::class, 'login'])->name('login');
+    Route::post('/api/logout', [AuthenticationController::class, 'logout'])->name('logout');
+});
+
+/**
+ * Note: Only put routes/features that require active subscription
+ */
+Route::middleware([
+    AuthenticationMiddleware::class,
+    SubscriptionMiddleware::class
+])->group(function () {
+    // Navigation Routes
     Route::get('/dashboard', [DashboardController::class, 'loadPage'])->name('dashboard.page.load');
     Route::get('/products', [ProductController::class, 'loadPage'])->name('products.page.load');
     Route::get('/pos', [POSController::class, 'loadPage'])->name('pos.page.load');
     Route::get('/reports', [ReportController::class, 'loadPage'])->name('reports.page.load');
 
     // API Routes
-    Route::post('/api/register', [RegistrationController::class, 'register'])->name('registration');
-    Route::post('/api/login', [AuthenticationController::class, 'login'])->name('login');
-    Route::post('/api/logout', [AuthenticationController::class, 'logout'])->name('logout');
-
     Route::post('/api/product/save/{product_uuid?}', [ProductController::class, 'save'])->name('product.save');
     Route::get('/api/product/search', [POSController::class, 'searchProducts'])->name('product.search');
     Route::put('/api/product/stock/{product_uuid}', [ProductController::class, 'updateStock'])->name('product.stock.update');

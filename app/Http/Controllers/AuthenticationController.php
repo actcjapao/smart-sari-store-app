@@ -11,7 +11,7 @@ use App\Models\User;
 class AuthenticationController extends Controller
 {
     function loadPage() {
-        return Inertia::render('login/Login');
+        return inertia('login/Login');
     }
 
     function login(Request $request) {

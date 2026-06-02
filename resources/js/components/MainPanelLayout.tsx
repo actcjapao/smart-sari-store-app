@@ -8,8 +8,7 @@ type MainPanelLayoutProps = {
 };
 
 type AuthUser = {
-   token: string;
-   uuid: string;
+   user_uuid: string;
    name: string;
    email: string;
 };

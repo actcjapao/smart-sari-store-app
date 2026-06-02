@@ -20,14 +20,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Share authenticated user saved in session by AuthenticationController
-        // Purpose: To make authenticated user data available globally in all Inertia views without needing to pass it explicitly from each controller method.
-        Inertia::share('auth', function () {
-            $user = session()->get('authenticated_user');
-
-            return [
-                'user' => $user ? (array) $user : null,
-            ];
-        });
+        //
     }
 }
