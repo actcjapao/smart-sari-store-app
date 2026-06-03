@@ -18,6 +18,7 @@ const MainPanelLayout = ({ children, title }: MainPanelLayoutProps) => {
 
    // Only props related to auth are typed here; url is excluded
    const { url, props } = usePage<{ auth?: { user?: AuthUser | null } }>(); // for active link detection and page props
+   // auth?.user -> comes from HandleInertiaRequests.php
    const user = props?.auth?.user ?? null;
 
    const initials = (() => {
