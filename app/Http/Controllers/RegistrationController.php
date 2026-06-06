@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 use App\Models\User;
 use App\Models\Store;
@@ -52,22 +54,41 @@ class RegistrationController extends Controller
         
         $request->validate($rules, $customErrorMessages);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        DB::transaction(function () use ($request) {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
 
-        $store = Store::create([
-            'name' => $request->store_name,
-            'description' => $request->description,
-            'location' => $request->location,
-        ]);
+            $store = Store::create([
+                'name' => $request->store_name,
+                'description' => $request->description,
+                'location' => $request->location,
+            ]);
 
-        $userStore = UserStore::create([
-            'user_id' => $user->id,
-            'store_id' => $store->id,
-        ]);
+            UserStore::create([
+                'user_id' => $user->id,
+                'store_id' => $store->id,
+            ]);
+
+            
+            /**
+             * Create a user subscription 'trial' plan for 15 days.
+             * subscription() method is provided by User.php model relationship
+             */
+            $user->subscription()->create([
+                'plan' => 'trial',
+                'status' => 'trialing',
+                'billing_cycle' => 'monthly',
+
+                'trial_start_at' => now(),
+                'trial_end_at' => now()->addDays(15),
+                'current_period_start_at' => now(),
+                'current_period_end_at' => now()->addDays(15),
+                'next_billing_at' => now()->addDays(15),
+            ]);
+        });
 
         // Do not double redirect. Instead, use back() to return to the registration page with a success message.
         // Then, in the frontend, you can check for this success message and redirect to the login page after a short delay.

@@ -70,7 +70,7 @@ class AuthenticationController extends Controller
 
     function logout() {
         if (session()->has('authenticated_user')) {
-            session()->invalidate();
+            session()->pull('authenticated_user');
         }
 
         return redirect('/login');
