@@ -1,1 +1,48 @@
+name: Deploy to Hostinger
 
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy_production:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' # Only run this job for 'main' branch (setup reference for dual envs: TourismWebsite repo)
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup SSH (Auth)
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          # Ensure the .ssh directory exists
+          mkdir -p ~/.ssh
+
+          # Write the private key to the id_rsa file
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+
+          # Set the correct permissions for the private key
+          chmod 600 ~/.ssh/id_rsa
+
+          # Add the SSH host key to known_hosts
+          ssh-keyscan -p 65002 153.92.9.58 >> ~/.ssh/known_hosts
+
+          # Set the correct permissions for the known_hosts file
+          chmod 644 ~/.ssh/known_hosts
+
+          # Start the SSH agent
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_rsa || echo "Error adding SSH key"
+
+      - name: Deploy to Production (app.ventapilot.com)
+        run: |
+          ssh -v -i ~/.ssh/id_rsa -p 65002 u788653447@153.92.9.58 "
+            RED='\033[0;31m'
+            GREEN='\033[0;32m'
+            YELLOW='\033[1;33m'
+            NC='\033[0m' # No Color
+
+            echo -e \"\${GREEN}✅ Deployment completed successfully!\${NC}\"
+          "
