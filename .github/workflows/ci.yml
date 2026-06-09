@@ -8,7 +8,7 @@ on:
 jobs:
   deploy_production:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/development' # Only run this job for 'main' branch c
+    if: github.ref == 'refs/heads/development' # Only run this job for 'develop' branch
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -32,16 +32,17 @@ jobs:
           # Set the correct permissions for the known_hosts file
           chmod 644 ~/.ssh/known_hosts
 
-          # Start the SSH agent and add the private key
+          # Start the SSH agent
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/id_rsa || echo "Error adding SSH key"
 
-      - name: Deploy to Production (app.ventapilot.com)
+      - name: Deploy to production
         run: |
           ssh -v -i ~/.ssh/id_rsa -p 65002 u788653447@153.92.9.58 "
             RED='\033[0;31m'
             GREEN='\033[0;32m'
             YELLOW='\033[1;33m'
-            NC='\033[0m'
-            echo -e \"\${GREEN}✅ Deployment to Production completed!\${NC}\"
+            NC='\033[0m' # No Color
+
+            echo -e \"\${GREEN}✅ Deployment completed successfully!\${NC}\"
           "
