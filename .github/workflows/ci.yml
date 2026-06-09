@@ -36,7 +36,7 @@ jobs:
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/id_rsa || echo "Error adding SSH key"
 
-      - name: Deploy to production
+      - name: Deploy to Production (app.ventapilot.com)
         run: |
           ssh -v -i ~/.ssh/id_rsa -p 65002 u788653447@153.92.9.58 "
             RED='\033[0;31m'
