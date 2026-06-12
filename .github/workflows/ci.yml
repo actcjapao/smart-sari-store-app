@@ -44,5 +44,8 @@ jobs:
             YELLOW='\033[1;33m'
             NC='\033[0m' # No Color
 
+            echo -e \"\${YELLOW}🔄 Navigating to VentaPilot Hostinger local repository directory...\${NC}\" &&
+            cd domains/ventapilot.com/public_html/subdomains/webapp/ventapilot-webapp &&
+
             echo -e \"\${GREEN}✅ Deployment completed successfully!\${NC}\"
           "

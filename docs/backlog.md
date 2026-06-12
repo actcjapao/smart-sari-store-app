@@ -21,6 +21,12 @@ This will serve as my guide throughout the development, deployment, & monitoring
 - [📝] Implement delete product
 - [📝] Implement search product
 
+Infra side
+
+- [📝] Continue with the CI/CD pipeline setup
+   - Ensure php binary compatibility if running php artisan commands within the CI/CD pipeline
+   - Finalize the app (sessioning, product list caching, product list searching, proper filterings)
+
 ## Medium Priority
 
 ## Low Priority
