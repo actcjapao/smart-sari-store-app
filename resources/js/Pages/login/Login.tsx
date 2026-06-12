@@ -56,7 +56,7 @@ const Login = () => {
          <div className="min-h-screen flex items-center justify-center">
             <div data-theme="mintlify" className="card sm:w-md my-5">
                <div className="card-header">
-                  <h5 className="card-title text-center">
+                  <h5 className="card-title text-center text-base-content/80">
                      Login to Your Account
                   </h5>
                </div>
