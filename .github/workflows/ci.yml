@@ -48,6 +48,7 @@ jobs:
             PHP84=/opt/alt/php84/usr/bin/php
             # Ensure Composer is available in the PATH or specify its location
             COMPOSER=$(which composer)
+            echo "COMPOSER=$COMPOSER" &&
 
             echo -e \"\${YELLOW}🔄 Navigating to VentaPilot Hostinger local repository directory...\${NC}\" &&
             cd domains/ventapilot.com/public_html/subdomains/webapp/ventapilot-webapp &&
@@ -69,7 +70,7 @@ jobs:
             echo -e \"\${YELLOW}🧠 Caching routes...\${NC}\" &&
             $PHP84 artisan route:cache &&
             echo -e \"\${YELLOW}🧠 Caching views...\${NC}\" &&
-            $PHP84 artisan view:cache
+            $PHP84 artisan view:cache &&
 
-            echo -e \"\${GREEN}✅ Deployment completed successfully!\${NC}\"
+            echo -e \"\${GREEN}✅ Deployment completed successfully\${NC}\"
           "
