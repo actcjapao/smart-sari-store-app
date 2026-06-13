@@ -138,3 +138,10 @@ payments
 
 - paid_at
 - created_at
+
+### To take note on environment setup in production (Hostinger)
+
+- make sure APP_NAME is set
+- make sure APP_KEY is generated
+- make sure APP_ENV is production
+- make sure APP_URL is properly set
