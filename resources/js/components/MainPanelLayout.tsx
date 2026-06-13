@@ -13,13 +13,21 @@ type AuthUser = {
    email: string;
 };
 
+type UserStore = {
+   store_name?: string;
+   store_uuid?: string;
+};
+
 const MainPanelLayout = ({ children, title }: MainPanelLayoutProps) => {
    const [sidebarOpen, setSidebarOpen] = useState(false);
 
    // Only props related to auth are typed here; url is excluded
-   const { url, props } = usePage<{ auth?: { user?: AuthUser | null } }>(); // for active link detection and page props
+   const { url, props } = usePage<{
+      auth?: { user?: AuthUser | null; store?: UserStore | null };
+   }>(); // for active link detection and page props
    // auth?.user -> comes from HandleInertiaRequests.php
    const user = props?.auth?.user ?? null;
+   const userStore = props?.auth?.store ?? null;
 
    const initials = (() => {
       if (!user?.name) return "JD";
@@ -155,6 +163,12 @@ const MainPanelLayout = ({ children, title }: MainPanelLayoutProps) => {
                   </div>
 
                   <div className="flex items-center gap-4">
+                     <span
+                        data-theme="mintlify"
+                        className="badge badge-outline border-dashed badge-primary"
+                     >
+                        {userStore?.store_name ?? "--"}
+                     </span>
                      <span className="text-sm">{user?.name ?? "--"}</span>
                      <div className="dropdown relative inline-flex">
                         <button

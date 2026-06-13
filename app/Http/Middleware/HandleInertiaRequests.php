@@ -53,6 +53,10 @@ class HandleInertiaRequests extends Middleware
                     'email' => $user->email,
                     // Add any other user attributes you want to share with Inertia
                 ] : null,
+                'store' => $user && $user->userStores->isNotEmpty() ? [
+                    'store_uuid' => $user->userStores[0]->store->uuid,
+                    'store_name' => $user->userStores[0]->store->name,
+                ] : null,
             ],
 
             'subscription' => $user ? [

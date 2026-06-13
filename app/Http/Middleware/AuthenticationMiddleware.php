@@ -48,7 +48,10 @@ class AuthenticationMiddleware
         if ($isAuthenticated) {
             $sessionUser = session('authenticated_user');
 
-            $user = User::with('subscription')
+            $user = User::with([
+                    'subscription',
+                    'userStores.store',
+                ])
                 ->where('uuid', $sessionUser->uuid)
                 ->first();
 
