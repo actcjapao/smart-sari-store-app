@@ -10,9 +10,35 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' # Only run this job for 'main' branch (setup reference for dual envs: TourismWebsite repo)
     steps:
+      # -------------------------
+      # 1. Checkout code
+      # -------------------------
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # -------------------------
+      # 2. Setup Node from .nvmrc
+      # -------------------------
+      - name: Setup Node from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      # -------------------------
+      # 3. Install frontend deps
+      # -------------------------
+      - name: Install NPM dependencies
+        run: npm ci
+
+      # -------------------------
+      # 4. Build frontend (Vite)
+      # -------------------------
+      - name: Build frontend assets
+        run: npm run build
+
+      # -------------------------
+      # 5. Setup SSH
+      # -------------------------
       - name: Setup SSH (Auth)
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -36,8 +62,17 @@ jobs:
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/id_rsa || echo "Error adding SSH key"
 
+      # -----------------------------------------
+      # 6. Deploy to Hosinger (via SSH remote)
+      # -----------------------------------------
       - name: Deploy to Production (app.ventapilot.com)
         run: |
+          # Upload ONLY build assets
+          rsync -avz public/build \
+          -e "ssh -i ~/.ssh/id_rsa -p 65002" \
+          u788653447@153.92.9.58:domains/ventapilot.com/public_html/subdomains/webapp/ventapilot-webapp/public/
+
+          # Deploy backend via SSH
           ssh -v -i ~/.ssh/id_rsa -p 65002 u788653447@153.92.9.58 "
             RED='\033[0;31m'
             GREEN='\033[0;32m'
