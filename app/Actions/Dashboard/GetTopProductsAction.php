@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class GetTopProductsAction
 {
-    public function handle(): array
+    public function handle(?int $storeId): array
     {
         // Expected return data structure from frontend:
         // return [
@@ -26,13 +26,17 @@ class GetTopProductsAction
         //         'stock_left' => 50,
         //     ],
         // ];
-        
+
+        if (!$storeId) {
+            return [];
+        }
+
         $today = now()->toDateString();
 
         return Product::query()
-
+            ->where('products.store_id', $storeId)
             ->leftJoin('sale_items', 'sale_items.product_id', '=', 'products.id')
-
+            ->leftJoin('sales', 'sales.id', '=', 'sale_items.sale_id')
             ->select([
                 'products.name',
                 'products.brand',
@@ -42,30 +46,23 @@ class GetTopProductsAction
                 DB::raw('COALESCE(SUM(sale_items.quantity), 0) as overall_sales'),
 
                 // Today's quantity sold
-                DB::raw("
-                    COALESCE(SUM(
+                DB::raw("COALESCE(SUM(
                         CASE
-                            WHEN DATE(sale_items.created_at) = '{$today}'
+                            WHEN DATE(sales.created_at) = '{$today}'
                             THEN sale_items.quantity
                             ELSE 0
                         END
-                    ), 0) as sales_today
-                "),
+                    ), 0) as sales_today"),
             ])
-
             ->groupBy(
                 'products.id',
                 'products.name',
                 'products.brand',
                 'products.stock_quantity'
             )
-
             ->orderByDesc('overall_sales')
-
             ->limit(5)
-
             ->get()
-
             ->map(function ($product) {
                 return [
                     'name' => $product->name,
@@ -75,7 +72,6 @@ class GetTopProductsAction
                     'stock_left' => (int) $product->stock_quantity,
                 ];
             })
-
             ->toArray();
     }
 }

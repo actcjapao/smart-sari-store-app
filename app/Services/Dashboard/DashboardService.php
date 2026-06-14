@@ -16,13 +16,15 @@ class DashboardService
         protected GetTopProductsAction $getTopProductsAction,
     ) {}
 
-    public function get(): array
+    public function get(\App\Models\User $user): array
     {
+        $storeId = $user->userStores->first()?->store_id;
+
         return [
-            'metrics' => $this->getMetricsAction->handle(),
-            'sales_overview_chart' => $this->getSalesOverviewAction->handle(),
-            'weekly_sales' => $this->getWeeklySalesAction->handle(),
-            'top_products' => $this->getTopProductsAction->handle(),
+            'metrics' => $this->getMetricsAction->handle($storeId),
+            'sales_overview_chart' => $this->getSalesOverviewAction->handle($storeId),
+            'weekly_sales' => $this->getWeeklySalesAction->handle($storeId),
+            'top_products' => $this->getTopProductsAction->handle($storeId),
         ];
     }
 }

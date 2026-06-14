@@ -23,8 +23,9 @@ This will serve as my guide throughout the development, deployment, & monitoring
 
 Infra side
 
-- [📝] Continue with the CI/CD pipeline setup
-   - Finalize the app (sessioning, product list caching, product list searching, proper filterings)
+- [📝] Finalize the app (sessioning, product list caching, product list searching, proper filterings)
+- [📝] Recheck database performance optimization (caching, indexing, eager loading, normalization etc.)
+- [📝] Fix Top Selling Products (still displays the product even if no sales at all)
 
 ## Medium Priority
 

@@ -8,7 +8,7 @@ use Carbon\CarbonPeriod;
 
 class GetSalesOverviewAction
 {
-    public function handle(): array
+    public function handle(?int $storeId): array
     {
         // Expected return data structure from frontend:
         // return [
@@ -23,7 +23,7 @@ class GetSalesOverviewAction
 
         $startDate = now()->subDays(6)->startOfDay();
         $endDate = now()->endOfDay();
-        
+
         // Sample data structure of the $salesData raw result:
         /**
          * [
@@ -41,32 +41,43 @@ class GetSalesOverviewAction
          *  ]
          * 
          */
-        
+
+        if (!$storeId) {
+            $result = [];
+            $period = \Carbon\CarbonPeriod::create(
+                $startDate->copy()->toDateString(),
+                $endDate->copy()->toDateString()
+            );
+
+            foreach ($period as $date) {
+                $result[] = [
+                    'date' => $date->format('M d, D'),
+                    'sales' => 0,
+                    'profit' => 0,
+                ];
+            }
+
+            return $result;
+        }
+
         // 1. Fetch actual sales data
         $salesData = Sale::query()
             ->join('sale_items', 'sales.id', '=', 'sale_items.sale_id')
-
             ->select([
                 DB::raw('DATE(sales.created_at) as raw_date'),
-
                 DB::raw('SUM(sale_items.total_price) as sales'),
-
                 DB::raw('SUM(
                     sale_items.total_price - sale_items.total_cost_price_at_sale
                 ) as profit'),
             ])
-
+            ->where('sales.store_id', $storeId)
             ->whereBetween('sales.created_at', [
                 $startDate,
                 $endDate,
             ])
-
             ->groupBy(DB::raw('DATE(sales.created_at)'))
-
             ->orderBy('raw_date', 'asc')
-
             ->get()
-
             ->keyBy('raw_date');
 
         // 2. Generate complete 7-day range

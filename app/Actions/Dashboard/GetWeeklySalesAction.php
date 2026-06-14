@@ -8,7 +8,7 @@ use Carbon\CarbonPeriod;
 
 class GetWeeklySalesAction
 {
-    public function handle(): array
+    public function handle(?int $storeId): array
     {
         // Expected return data structure from frontend:
         // return [
@@ -23,6 +23,25 @@ class GetWeeklySalesAction
 
         $startOfWeek = now()->startOfWeek();
         $endOfWeek = now()->endOfWeek();
+
+        if (!$storeId) {
+            $result = [];
+            $period = CarbonPeriod::create(
+                $startOfWeek->copy()->toDateString(),
+                $endOfWeek->copy()->toDateString()
+            );
+
+            foreach ($period as $date) {
+                $result[] = [
+                    'date' => $date->toDateString(),
+                    'day' => $date->format('l'),
+                    'total_sales' => 0,
+                    'total_profit' => 0,
+                ];
+            }
+
+            return $result;
+        }
 
         // Sample data structure of the $salesData raw result:
         /**
@@ -45,28 +64,21 @@ class GetWeeklySalesAction
         // 1. Fetch aggregated sales data
         $salesData = Sale::query()
             ->join('sale_items', 'sales.id', '=', 'sale_items.sale_id')
-
             ->select([
                 DB::raw('DATE(sales.created_at) as raw_date'),
-
                 DB::raw('SUM(sale_items.total_price) as total_sales'),
-
                 DB::raw('SUM(
                     sale_items.total_price - sale_items.total_cost_price_at_sale
                 ) as total_profit'),
             ])
-
+            ->where('sales.store_id', $storeId)
             ->whereBetween('sales.created_at', [
                 $startOfWeek,
                 $endOfWeek,
             ])
-
             ->groupBy(DB::raw('DATE(sales.created_at)'))
-
             ->orderBy('raw_date', 'asc')
-
             ->get()
-
             ->keyBy('raw_date');
 
         // 2. Generate complete Monday-Sunday range
@@ -84,7 +96,7 @@ class GetWeeklySalesAction
             $existing = $salesData->get($dateKey);
 
             $result[] = [
-                'date' => $date->format('Y-m-d'),
+                'date' => $date->toDateString(),
                 'day' => $date->format('l'),
                 'total_sales' => (float) ($existing?->total_sales ?? 0),
                 'total_profit' => (float) ($existing?->total_profit ?? 0),
